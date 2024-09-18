@@ -54,7 +54,8 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        //return new ArrayList<ChessMove>(); NEED TO WORK ON THIS
+        //NEED TO WORK ON THIS
+        return new ArrayList<ChessMove>();
     }
 
     //toString function
