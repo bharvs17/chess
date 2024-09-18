@@ -46,4 +46,17 @@ public class ChessBoard {
         throw new RuntimeException("Not implemented");
     }
 
+    //equals and hash functions
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
+    }
 }
