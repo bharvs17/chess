@@ -46,6 +46,12 @@ public class ChessBoard {
         throw new RuntimeException("Not implemented");
     }
 
+    //toString function
+    @Override
+    public String toString() {
+        return "Board: " + Arrays.deepToString(board);
+    }
+
     //equals and hash functions
     @Override
     public boolean equals(Object o) {

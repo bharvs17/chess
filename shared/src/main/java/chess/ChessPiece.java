@@ -57,6 +57,12 @@ public class ChessPiece {
         //return new ArrayList<ChessMove>(); NEED TO WORK ON THIS
     }
 
+    //toString function
+    @Override
+    public String toString() {
+        return "ChessPiece type: " + this.type + "color: " + this.pieceColor;
+    }
+
     //equals and hash functions
     @Override
     public boolean equals(Object o) {
