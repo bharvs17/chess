@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.Collection;
 import java.util.Objects;
+import java.util.ArrayList;
 
 /**
  * Represents a single square position on a chess board
@@ -33,6 +35,12 @@ public class ChessPosition {
     public int getColumn() {
         return col;
     }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+
 
     @Override
     public String toString() {

@@ -54,8 +54,29 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        //NEED TO WORK ON THIS
-        return new ArrayList<ChessMove>();
+        PieceMovesCalculator calc;
+        if(board.getPiece(myPosition).getPieceType() == PieceType.PAWN) {
+            calc = new PawnMovesCalculator();
+        }
+        else if(board.getPiece(myPosition).getPieceType() == PieceType.KNIGHT) {
+            calc = new KnightMovesCalculator();
+        }
+        else if(board.getPiece(myPosition).getPieceType() == PieceType.ROOK) {
+            calc = new RookMovesCalculator();
+        }
+        else if(board.getPiece(myPosition).getPieceType() == PieceType.BISHOP) {
+            calc = new BishopMovesCalculator();
+        }
+        else if(board.getPiece(myPosition).getPieceType() == PieceType.KING) {
+            calc = new KingMovesCalculator();
+        }
+        else if(board.getPiece(myPosition).getPieceType() == PieceType.QUEEN) {
+            calc = new QueenMovesCalculator();
+        }
+        else {
+            return new ArrayList<ChessMove>();
+        }
+        return calc.pieceMoves(board, myPosition);
     }
 
     //toString function
