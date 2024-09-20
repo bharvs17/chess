@@ -38,7 +38,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
                 validMoves.add(new ChessMove(position, new ChessPosition(row - i, col + i), null));
                 i++;
             }
-            if(row - i >= 1 && col + 1 <= 8 && board.getPieceRC(row - i, col + i).getTeamColor() == ChessGame.TeamColor.BLACK) {
+            if(row - i >= 1 && col + i <= 8 && board.getPieceRC(row - i, col + i).getTeamColor() == ChessGame.TeamColor.BLACK) {
                 validMoves.add(new ChessMove(position, new ChessPosition(row - i, col + i), null));
             }
             //right left
@@ -74,7 +74,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
                 validMoves.add(new ChessMove(position, new ChessPosition(row - i, col + i), null));
                 i++;
             }
-            if(row - i >= 1 && col + 1 <= 8 && board.getPieceRC(row - i, col + i).getTeamColor() == ChessGame.TeamColor.WHITE) {
+            if(row - i >= 1 && col + i <= 8 && board.getPieceRC(row - i, col + i).getTeamColor() == ChessGame.TeamColor.WHITE) {
                 validMoves.add(new ChessMove(position, new ChessPosition(row - i, col + i), null));
             }
             //right left
