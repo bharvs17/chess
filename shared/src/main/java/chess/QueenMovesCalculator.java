@@ -13,7 +13,7 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
         int row = position.getRow();
         int col = position.getColumn();
         int i = 1;
-
+        //can about half the code needed by just seeing if piece at position has opposite color to piece it's trying to move to and then adding to validMoves
         if(board.getPiece(position).getTeamColor() == ChessGame.TeamColor.WHITE) {
             //ROOK CODE
             //up
