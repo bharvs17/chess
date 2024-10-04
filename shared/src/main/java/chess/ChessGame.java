@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -60,7 +59,10 @@ public class ChessGame {
         if there's a piece from the other team in one of those spots, see if it's a piece that could move that way to attack king (ex diagonal would
         be pawns if 1 space, bishop or queen from any amount of spaces) and if so then remove that move
         */
-        ArrayList<ChessMove> maybeValidMoves = (ArrayList<ChessMove>) board.getPiece(startPosition).pieceMoves(board, startPosition);
+        return removeBadMoves(board.getPiece(startPosition).pieceMoves(board,startPosition));
+    }
+
+    private Collection<ChessMove> removeBadMoves(Collection<ChessMove> moves) {
 
     }
 
@@ -289,8 +291,9 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         //same as isInCheck, but if teamColor has no moves that get out of check then return true, use validMoves function
         if(isInCheck(teamColor)) {
-            //now check if no moves for all pieces
+            return noMovesPossible(teamColor);
         }
+        return false;
     }
 
     /**
@@ -302,6 +305,23 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         //check all pieces for teamColor and see if they have 0 validMoves and not in check or checkmate
+        if(!isInCheck(teamColor)) {
+            return noMovesPossible(teamColor);
+        }
+        return false;
+    }
+
+    private boolean noMovesPossible(TeamColor teamColor) {
+        for(int r = 1; r <= 8; r++) {
+            for(int c = 1; c <= 8; c++) {
+                if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                    if(!validMoves(new ChessPosition(r,c)).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
