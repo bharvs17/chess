@@ -104,9 +104,21 @@ public class ChessGame {
         if(currentTeam != board.getPiece(move.getStartPosition()).getTeamColor()) {
             throw new InvalidMoveException("Invalid Move- wrong team color");
         }
-        if() //check if given move is in list of validMoves for piece at that position, see above function, if not then throw exception for invalid move
-            //for added detail check if in check and say that they must get out of check
-            //if good move then update board and currentTeam accordingly
+        if(!validMoves(move.getStartPosition()).contains(move)) {
+            throw new InvalidMoveException("Invalid move- Either move not possible for selected piece or move results in check.");
+        }
+        if(move.getPromotionPiece() != null) {
+            board.addPiece(move.getEndPosition(),new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),move.getPromotionPiece()));
+            board.addPiece(move.getStartPosition(),null);
+        } else {
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+            board.addPiece(move.getStartPosition(), null);
+        }
+        if(currentTeam == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
 
     /**
