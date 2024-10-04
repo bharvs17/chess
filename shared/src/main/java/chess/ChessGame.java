@@ -17,6 +17,7 @@ public class ChessGame {
     public ChessGame() {
         currentTeam = TeamColor.WHITE;
         board = new ChessBoard();
+        board.resetBoard();
     }
 
     /**
@@ -101,8 +102,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if(board.getPiece(move.getStartPosition()) == null) {
+            throw new InvalidMoveException("Invalid move- no piece at given start position");
+        }
         if(currentTeam != board.getPiece(move.getStartPosition()).getTeamColor()) {
-            throw new InvalidMoveException("Invalid Move- wrong team color");
+            throw new InvalidMoveException("Invalid Move- not this team's turn");
         }
         if(!validMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException("Invalid move- Either move not possible for selected piece or move results in check.");
@@ -130,6 +134,9 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         //check if king for given color is under attack by any pieces from the other color
         ChessPosition kingPos = getKingPos(board, teamColor);
+        if(kingPos == null) {
+            return false; //for tests- some don't have a king on the board so it messes things up
+        }
         int row = kingPos.getRow();
         int col = kingPos.getColumn();
         //check knight spots
@@ -231,7 +238,7 @@ public class ChessGame {
         }
         //L
         c = col - 1;
-        while(c >= 8) {
+        while(c >= 1) {
             if(board.getPieceRC(row,c) != null && board.getPieceRC(row,c).getTeamColor() == teamColor) {
                 break;
             }
@@ -315,7 +322,7 @@ public class ChessGame {
     private ChessPosition getKingPos(ChessBoard board, TeamColor teamColor) {
         for(int r = 1; r <= 8; r++) {
             for(int c = 1; c <= 8; c++) {
-                if(board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING && board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING && board.getPieceRC(r,c).getTeamColor() == teamColor) {
                     return new ChessPosition(r,c);
                 }
             }
