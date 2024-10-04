@@ -142,7 +142,131 @@ public class ChessGame {
                 }
             }
         }
-        //end knight checks
+        //now check lines UDLR, and diagonal
+        //U
+        int r = row+1;
+        while(r <= 8) {
+            if(board.getPieceRC(r,col) != null && board.getPieceRC(r,col).getTeamColor() == teamColor) {
+                break; //piece from same team would block anything else above it, don't need to check up anymore
+            }
+            if(board.getPieceRC(r,col) != null && board.getPieceRC(r,col).getTeamColor() != teamColor && (board.getPieceRC(r,col).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(r,col).getPieceType() == ChessPiece.PieceType.ROOK)) {
+                return true;
+            }
+            if(r == row+1 && board.getPieceRC(r,col) != null && board.getPieceRC(r,col).getPieceType() == ChessPiece.PieceType.KING) {
+                //should only be 2 kings on board, so if one encountered then it's the enemy king
+                return true;
+            }
+            r++;
+        }
+        //D
+        r = row-1;
+        while(r >= 1) {
+            if(board.getPieceRC(r,col) != null && board.getPieceRC(r,col).getTeamColor() == teamColor) {
+                break;
+            }
+            if(board.getPieceRC(r,col) != null && board.getPieceRC(r,col).getTeamColor() != teamColor && (board.getPieceRC(r,col).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(r,col).getPieceType() == ChessPiece.PieceType.ROOK)) {
+                return true;
+            }
+            if(r == row-1 && board.getPieceRC(r,col) != null && board.getPieceRC(r,col).getPieceType() == ChessPiece.PieceType.KING) {
+                return true;
+            }
+            r--;
+        }
+        //R
+        int c = col + 1;
+        while(c <= 8) {
+            if(board.getPieceRC(row,c) != null && board.getPieceRC(row,c).getTeamColor() == teamColor) {
+                break;
+            }
+            if(board.getPieceRC(row,c) != null && board.getPieceRC(row,c).getTeamColor() != teamColor && (board.getPieceRC(row,c).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(row,c).getPieceType() == ChessPiece.PieceType.ROOK)) {
+                return true;
+            }
+            if(c == col+1 && board.getPieceRC(row,c) != null && board.getPieceRC(row,c).getPieceType() == ChessPiece.PieceType.KING) {
+                return true;
+            }
+            c++;
+        }
+        //L
+        c = col - 1;
+        while(c >= 8) {
+            if(board.getPieceRC(row,c) != null && board.getPieceRC(row,c).getTeamColor() == teamColor) {
+                break;
+            }
+            if(board.getPieceRC(row,c) != null && board.getPieceRC(row,c).getTeamColor() != teamColor && (board.getPieceRC(row,c).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(row,c).getPieceType() == ChessPiece.PieceType.ROOK)) {
+                return true;
+            }
+            if(c == col-1 && board.getPieceRC(row,c) != null && board.getPieceRC(row,c).getPieceType() == ChessPiece.PieceType.KING) {
+                return true;
+            }
+            c--;
+        }
+        //UR
+        r = row+1;
+        c = col+1;
+        while(r <= 8 && c <= 8) {
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                break;
+            }
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() != teamColor && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.BISHOP)) {
+                return true;
+            }
+            if(r == row+1 && c == col+1 && board.getPieceRC(r,c) != null && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.PAWN)) {
+                //if directly UR and is king then check, or if pawn then check (if it was a friendly pawn then would break in first if statement)
+                return true;
+            }
+            r++;
+            c++;
+        }
+        //UL
+        r = row+1;
+        c = col-1;
+        while(r <= 8 && c >= 1) {
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                break;
+            }
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() != teamColor && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.BISHOP)) {
+                return true;
+            }
+            if(r == row+1 && c == col-1 && board.getPieceRC(r,c) != null && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.PAWN)) {
+                return true;
+            }
+            r++;
+            c--;
+        }
+        //DR
+        r = row-1;
+        c = col+1;
+        while(r >= 1 && c <= 8) {
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                break;
+            }
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() != teamColor && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.BISHOP)) {
+                return true;
+            }
+            if(r == row-1 && c == col+1 && board.getPieceRC(r,c) != null && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.PAWN)) {
+                return true;
+            }
+            r--;
+            c++;
+        }
+        //DL
+        r = row-1;
+        c = col-1;
+        while(r >= 1 && c >= 1) {
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                break;
+            }
+            if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getTeamColor() != teamColor && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.QUEEN || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.BISHOP)) {
+                return true;
+            }
+            if(r == row-1 && c == col-1 && board.getPieceRC(r,c) != null && (board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING || board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.PAWN)) {
+                return true;
+            }
+            r--;
+            c--;
+        }
+        //if nothing returned true then not in check; return false
+        return false;
     }
 
     private ChessPosition getKingPos(ChessBoard board, TeamColor teamColor) {
