@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -63,7 +64,34 @@ public class ChessGame {
     }
 
     private Collection<ChessMove> removeBadMoves(Collection<ChessMove> moves) {
-
+        ArrayList<ChessMove> goodMoves = (ArrayList<ChessMove>) moves;
+        ArrayList<ChessMove> badMoves = new ArrayList<>();
+        if(moves.isEmpty()) {
+            return goodMoves;
+        }
+        ChessPosition startPos = goodMoves.getFirst().getStartPosition();
+        ChessPiece testPiece = board.getPiece(startPos);
+        ChessGame.TeamColor teamColor = testPiece.getTeamColor();
+        board.addPiece(startPos,null);
+        ChessPosition endPos;
+        for(int i = 0; i < moves.size(); i++) {
+            //make move as a test
+            endPos = goodMoves.get(i).getEndPosition();
+            ChessPiece temp = board.getPiece(endPos);
+            board.addPiece(endPos, testPiece);
+            if(isInCheck(teamColor)) {
+                badMoves.add(goodMoves.get(i));
+            }
+            //reset piece that might've been taken before next test
+            board.addPiece(endPos,temp);
+        }
+        //reset test piece
+        board.addPiece(startPos, testPiece);
+        //remove all bad moves
+        for(int i = 0; i < badMoves.size(); i++) {
+            goodMoves.remove(badMoves.get(i));
+        }
+        return goodMoves;
     }
 
     /**
@@ -78,6 +106,7 @@ public class ChessGame {
         }
         if() //check if given move is in list of validMoves for piece at that position, see above function, if not then throw exception for invalid move
             //for added detail check if in check and say that they must get out of check
+            //if good move then update board and currentTeam accordingly
     }
 
     /**
