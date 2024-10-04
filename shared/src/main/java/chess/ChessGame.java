@@ -13,14 +13,10 @@ public class ChessGame {
 
     TeamColor currentTeam;
     ChessBoard board;
-    ChessPosition blackKingPos;
-    ChessPosition whiteKingPos;
 
     public ChessGame() {
         currentTeam = TeamColor.WHITE;
         board = new ChessBoard();
-        blackKingPos = null;
-        whiteKingPos = null;
     }
 
     /**
@@ -90,7 +86,74 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         //check if king for given color is under attack by any pieces from the other color
+        ChessPosition kingPos = getKingPos(board, teamColor);
+        int row = kingPos.getRow();
+        int col = kingPos.getColumn();
+        //check knight spots
+        //U LR
+        if(row + 2 <= 8) {
+            if(col + 1 <= 8) {
+                if(board.getPieceRC(row+2,col+1) != null && board.getPieceRC(row+2,col+1).getTeamColor() != teamColor && board.getPieceRC(row+2,col+1).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+            if(col - 1 >= 1) {
+                if(board.getPieceRC(row+2,col-1) != null && board.getPieceRC(row+2,col-1).getTeamColor() != teamColor && board.getPieceRC(row+2,col-1).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+        }
+        //D LR
+        if(row - 2 >= 1) {
+            if(col + 1 <= 8) {
+                if(board.getPieceRC(row-2,col+1) != null && board.getPieceRC(row-2,col+1).getTeamColor() != teamColor && board.getPieceRC(row-2,col+1).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+            if(col - 1 >= 1) {
+                if(board.getPieceRC(row-2,col-1) != null && board.getPieceRC(row-2,col-1).getTeamColor() != teamColor && board.getPieceRC(row-2,col-1).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+        }
+        //R UD
+        if(col + 2 <= 8) {
+            if(row + 1 <= 8) {
+                if(board.getPieceRC(row+1,col+2) != null && board.getPieceRC(row+1,col+2).getTeamColor() != teamColor && board.getPieceRC(row+1,col+2).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+            if(row - 1 >= 1) {
+                if(board.getPieceRC(row-1,col+2) != null && board.getPieceRC(row-1,col+2).getTeamColor() != teamColor && board.getPieceRC(row-1,col+2).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+        }
+        //L UD
+        if(col - 2 >= 1) {
+            if(row + 1 <= 8) {
+                if(board.getPieceRC(row+1,col-2) != null && board.getPieceRC(row+1,col-2).getTeamColor() != teamColor && board.getPieceRC(row+1,col-2).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+            if(row - 1 >= 1) {
+                if(board.getPieceRC(row-1,col-2) != null && board.getPieceRC(row-1,col-2).getTeamColor() != teamColor && board.getPieceRC(row-1,col-2).getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                    return true;
+                }
+            }
+        }
+        //end knight checks
+    }
 
+    private ChessPosition getKingPos(ChessBoard board, TeamColor teamColor) {
+        for(int r = 1; r <= 8; r++) {
+            for(int c = 1; c <= 8; c++) {
+                if(board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING && board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                    return new ChessPosition(r,c);
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -124,8 +187,6 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
-        whiteKingPos = board.getWKing();
-        blackKingPos = board.getBKing();
     }
 
     /**

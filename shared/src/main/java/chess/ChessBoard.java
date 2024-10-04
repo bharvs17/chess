@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -73,28 +74,6 @@ public class ChessBoard {
         board[0][4] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
         board[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
         board[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
-    }
-
-    public ChessPosition getBKing() {
-        for(int i = 1; i <= 8; i++) {
-            for(int g = 1; g <= 8; g++) {
-                if(getPieceRC(i,g) != null && getPieceRC(i,g).getPieceType() == ChessPiece.PieceType.KING && getPieceRC(i,g).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                    return new ChessPosition(i,g);
-                }
-            }
-        }
-        return null;
-    }
-
-    public ChessPosition getWKing() {
-        for(int i = 1; i <= 8; i++) {
-            for(int g = 1; g <= 8; g++) {
-                if(getPieceRC(i,g) != null && getPieceRC(i,g).getPieceType() == ChessPiece.PieceType.KING && getPieceRC(i,g).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    return new ChessPosition(i,g);
-                }
-            }
-        }
-        return null;
     }
 
     //toString function
