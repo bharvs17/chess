@@ -118,4 +118,6 @@ public class KingMovesCalculator implements PieceMovesCalculator {
 
         return validMoves;
     }
+
+    public ArrayList<ChessPosition> dangerSpots(ChessBoard board, )
 }

@@ -75,6 +75,28 @@ public class ChessBoard {
         board[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
     }
 
+    public ChessPosition getBKing() {
+        for(int i = 1; i <= 8; i++) {
+            for(int g = 1; g <= 8; g++) {
+                if(getPieceRC(i,g) != null && getPieceRC(i,g).getPieceType() == ChessPiece.PieceType.KING && getPieceRC(i,g).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                    return new ChessPosition(i,g);
+                }
+            }
+        }
+        return null;
+    }
+
+    public ChessPosition getWKing() {
+        for(int i = 1; i <= 8; i++) {
+            for(int g = 1; g <= 8; g++) {
+                if(getPieceRC(i,g) != null && getPieceRC(i,g).getPieceType() == ChessPiece.PieceType.KING && getPieceRC(i,g).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    return new ChessPosition(i,g);
+                }
+            }
+        }
+        return null;
+    }
+
     //toString function
     @Override
     public String toString() {

@@ -55,6 +55,9 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceMovesCalculator calc;
+        if(board.getPiece(myPosition) == null) {
+            return null;
+        }
         if(board.getPiece(myPosition).getPieceType() == PieceType.PAWN) {
             calc = new PawnMovesCalculator();
         }
@@ -74,7 +77,7 @@ public class ChessPiece {
             calc = new QueenMovesCalculator();
         }
         else {
-            return new ArrayList<ChessMove>();
+            return new ArrayList<>();
         }
         return calc.pieceMoves(board, myPosition);
     }

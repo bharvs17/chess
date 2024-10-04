@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -12,10 +13,14 @@ public class ChessGame {
 
     TeamColor currentTeam;
     ChessBoard board;
+    ChessPosition blackKingPos;
+    ChessPosition whiteKingPos;
 
     public ChessGame() {
         currentTeam = TeamColor.WHITE;
         board = new ChessBoard();
+        blackKingPos = null;
+        whiteKingPos = null;
     }
 
     /**
@@ -50,7 +55,17 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        //get valid moves at startPosition from moves calculator then go through and find which moves are bad (would be check/checkmate) and remove
+        if(board.getPiece(startPosition) == null) {
+            return null;
+        }
+        //remove moves if they don't get you out of check
+        /*algorithm: try making move, then starting from king check possible attack sites- directly around, diagonals, lines, knight
+        if there's a piece from the other team in one of those spots, see if it's a piece that could move that way to attack king (ex diagonal would
+        be pawns if 1 space, bishop or queen from any amount of spaces) and if so then remove that move
+        */
+        ArrayList<ChessMove> maybeValidMoves = (ArrayList<ChessMove>) board.getPiece(startPosition).pieceMoves(board, startPosition);
+
     }
 
     /**
@@ -60,7 +75,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        if(currentTeam != board.getPiece(move.getStartPosition()).getTeamColor()) {
+            throw new InvalidMoveException("Invalid Move- wrong team color");
+        }
+        if() //check if given move is in list of validMoves for piece at that position, see above function, if not then throw exception for invalid move
+            //for added detail check if in check and say that they must get out of check
     }
 
     /**
@@ -70,7 +89,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //check if king for given color is under attack by any pieces from the other color
+
     }
 
     /**
@@ -80,7 +100,10 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //same as isInCheck, but if teamColor has no moves that get out of check then return true, use validMoves function
+        if(isInCheck(teamColor)) {
+            //now check if no moves for all pieces
+        }
     }
 
     /**
@@ -91,7 +114,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //check all pieces for teamColor and see if they have 0 validMoves and not in check or checkmate
     }
 
     /**
@@ -101,6 +124,8 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+        whiteKingPos = board.getWKing();
+        blackKingPos = board.getBKing();
     }
 
     /**
