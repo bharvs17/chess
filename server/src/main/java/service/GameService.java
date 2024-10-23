@@ -4,6 +4,10 @@ import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.MemoryGameDAO;
+import dataaccess.model.CreateGameReq;
+import dataaccess.model.CreateGameRes;
+import dataaccess.model.JoinGameReq;
+import dataaccess.model.ListGameRes;
 import model.GameData;
 
 import java.util.Collection;
@@ -15,6 +19,24 @@ public class GameService {
     public GameService(GameDAO gameAccess) {
         this.gameAccess = gameAccess;
     }
+
+    public ListGameRes listGames() {
+        return gameAccess.listGames();
+    }
+
+    public CreateGameRes makeGame(CreateGameReq gameReq) throws DataAccessException {
+        return gameAccess.makeGame(gameReq);
+    }
+
+    public void joinGame(JoinGameReq gameReq, String username) throws DataAccessException {
+        gameAccess.joinGame(gameReq, username);
+    }
+
+    public void deleteAllGames() {
+        gameAccess.deleteAllGames();
+    }
+
+    //OLD BELOW
 
     public int createGame(String gameName) throws DataAccessException {
         return gameAccess.createGame(gameName);
@@ -32,8 +54,5 @@ public class GameService {
         gameAccess.joinGame(gameID, color, username);
     }
 
-    public void deleteAll() {
-        gameAccess.deleteAll();
-    }
 
 }

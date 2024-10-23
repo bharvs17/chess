@@ -12,6 +12,28 @@ public class AuthService {
         this.authAccess = authAccess;
     }
 
+    public void addAuth(AuthData authData) throws DataAccessException {
+        authAccess.addAuth(authData);
+    }
+
+    public AuthData getAuth(String username) throws DataAccessException {
+        return authAccess.getAuth(username);
+    }
+
+    public void logout(String authToken) throws DataAccessException {
+        authAccess.logout(authToken);
+    }
+
+    public void checkAuth(String authToken) throws DataAccessException {
+        authAccess.checkAuth(authToken);
+    }
+
+    public String getUsername(String authToken) throws DataAccessException {
+        return authAccess.getUsername(authToken);
+    }
+
+    //OLD METHODS BELOW
+
     public void createAuth(AuthData authData) throws DataAccessException {
         authAccess.createAuth(authData);
     }
@@ -22,10 +44,6 @@ public class AuthService {
 
     public void deleteAllAuths() {
         authAccess.deleteAllAuths();
-    }
-
-    public AuthData getAuth(String authToken) throws DataAccessException {
-        return authAccess.getAuth(authToken);
     }
 
     public boolean tokenInDatabase(String authToken) {
