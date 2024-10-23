@@ -9,5 +9,7 @@ public interface UserDAO {
 
     public UserData getUser(String username, String password) throws DataAccessException;
 
+    public UserData checkUser(String username);
+
     public void deleteAllUsers();
 }

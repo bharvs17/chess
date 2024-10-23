@@ -10,9 +10,9 @@ public class MemoryUserDAO implements UserDAO {
     final private HashMap<String, UserData> users = new HashMap<>();
 
     @Override
-    public AuthData createUser(UserData userData) throws DataAccessException {
+    public AuthData createUser(UserData userData) throws DataAccessException { //also returns AuthData for a player logging in
         if(users.containsKey(userData.username())) {
-            throw new DataAccessException(403, "Username already in database.");
+            return new AuthData(UUID.randomUUID().toString(),userData.username());
         } else {
             users.put(userData.username(), userData);
         }
@@ -30,6 +30,11 @@ public class MemoryUserDAO implements UserDAO {
                 return users.get(username);
             }
         }
+    }
+
+    @Override
+    public UserData checkUser(String username) {
+        return users.getOrDefault(username, null);
     }
 
     @Override

@@ -12,8 +12,8 @@ public class AuthService {
         this.authAccess = authAccess;
     }
 
-    public AuthData createAuth(AuthData authData) throws DataAccessException {
-        return authAccess.createAuth(authData);
+    public void createAuth(AuthData authData) throws DataAccessException {
+        authAccess.createAuth(authData);
     }
 
     public void deleteAuth(AuthData authData) throws DataAccessException {

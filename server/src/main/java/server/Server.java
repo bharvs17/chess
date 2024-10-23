@@ -2,19 +2,30 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
+import model.AuthData;
 import model.UserData;
+import service.AuthService;
+import service.GameService;
 import service.UserService;
 import spark.*;
+
+import java.util.UUID;
 
 public class Server {
 
     private final Gson gson;
     private final UserService userService;
+    private final AuthService authService;
+    private final GameService gameService;
 
     public Server() {
         this.gson = new Gson();
         this.userService = new UserService(new MemoryUserDAO());
+        this.authService = new AuthService(new MemoryAuthDAO());
+        this.gameService = new GameService(new MemoryGameDAO());
     }
     //plus services for auth and game
 
@@ -60,10 +71,18 @@ public class Server {
     }
 
     private Object register(Request req, Response res) throws DataAccessException {
-        var user = gson.fromJson(req.body(), UserData.class);
-        var auth = userService.createUser(user);
-        res.status(200);
-        return gson.toJson(auth);
+        UserData userData = gson.fromJson(req.body(), UserData.class);
+        var check = userService.checkUser(userData.username());
+        if(check != null) {
+            throw new DataAccessException(500, "Username already exists in database.");
+        } else {
+            AuthData authData = userService.createUser(userData);
+            authService.createAuth(authData);
+            res.status(200);
+            return gson.toJson(authData);
+        }
     }
+
+
 
 }
