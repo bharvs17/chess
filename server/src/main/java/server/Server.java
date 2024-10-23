@@ -83,6 +83,20 @@ public class Server {
         }
     }
 
-
+    private Object login(Request req, Response res) throws DataAccessException {
+        UserData userData = gson.fromJson(req.body(), UserData.class);
+        userData = userService.checkUser(userData.username());
+        if(userData == null) {
+            throw new DataAccessException(500, "No such username in database");
+        } else {
+            if(userService.getUser(userData.username(),userData.password()) == null) {
+                throw new DataAccessException(500, "Incorrect password.");
+            }
+            AuthData authData = userService.createUser(userData);
+            authService.createAuth(authData);
+            res.status(200);
+            return gson.toJson(authData);
+        }
+    }
 
 }

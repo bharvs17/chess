@@ -25,7 +25,7 @@ public class MemoryUserDAO implements UserDAO {
             throw new DataAccessException(500, String.format("No username: %s in database.", username));
         } else {
             if(!users.get(username).password().equals(password)) {
-                throw new DataAccessException(401, "Incorrect Password.");
+                return null;
             } else {
                 return users.get(username);
             }

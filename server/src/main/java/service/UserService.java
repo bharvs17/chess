@@ -14,6 +14,10 @@ public class UserService {
         this.userAccess = userAccess;
     }
 
+    public UserData getUser(String username, String password) throws DataAccessException {
+        return userAccess.getUser(username, password);
+    }
+
     public UserData checkUser(String username) {
         return userAccess.checkUser(username);
     }
