@@ -12,9 +12,7 @@ import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.*;
-
 import java.util.ArrayList;
-import java.util.Map;
 
 public class Server {
 
@@ -37,21 +35,15 @@ public class Server {
 
         Spark.staticFiles.location("web");
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", this::register); //register
-        Spark.post("/name/:name", this::test); //TEST FUNCTION
-        Spark.get("/name", this::list); //ALSO TEST
-        //Spark.post("/session", ) //login
-        //Spark.delete("/session", ) //logout
-        //Spark.get("/game", ) //listGames
-        //Spark.post("/game", ) //createGame
-        //Spark.put("/game", ) //joinGame
-        //Spark.delete("/db", ) //clear
-        Spark.exception(DataAccessException.class, this::exceptionHandler);
 
-        //2nd parameter is function to link to
-        //could do in a handler class or in here
-        //see petshop for example
-        //still need to figure out database
+        Spark.post("/user", this::register);
+        Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
+        Spark.get("/game", this::listGames);
+        Spark.post("/game/", this::createGame);
+        Spark.put("/game", this::joinGame);
+        Spark.delete("/db", this::clear);
+        Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -63,16 +55,6 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
-    }
-
-    private Object test(Request req, Response res) {
-        strings.add(req.params(":name"));
-        return list(req,res);
-    }
-
-    private Object list(Request req, Response res) {
-        res.type("application/json");
-        return gson.toJson(Map.of("strings",strings));
     }
 
     private void exceptionHandler(DataAccessException ex, Request req, Response res) {
