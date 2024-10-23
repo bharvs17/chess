@@ -10,8 +10,6 @@ public interface AuthDAO {
 
     public void deleteAllAuths();
 
-    public AuthData getAuth(AuthData authData) throws DataAccessException;
-
     public AuthData getAuth(String authToken) throws DataAccessException;
 
     public boolean tokenInDatabase(String authToken);

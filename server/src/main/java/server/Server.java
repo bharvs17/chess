@@ -13,12 +13,16 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 public class Server {
 
     private final Gson gson;
     private final UserService userService;
     private final AuthService authService;
     private final GameService gameService;
+    private ArrayList<String> strings = new ArrayList<>();
 
     public Server() {
         this.gson = new Gson();
@@ -34,7 +38,8 @@ public class Server {
         Spark.staticFiles.location("web");
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::register); //register
-        Spark.post("/name", this::test); //TEST FUNCTION
+        Spark.post("/name/:name", this::test); //TEST FUNCTION
+        Spark.get("/name", this::list); //ALSO TEST
         //Spark.post("/session", ) //login
         //Spark.delete("/session", ) //logout
         //Spark.get("/game", ) //listGames
@@ -61,8 +66,13 @@ public class Server {
     }
 
     private Object test(Request req, Response res) {
-        String h = "hello";
-        return gson.toJson(h);
+        strings.add(req.params(":name"));
+        return list(req,res);
+    }
+
+    private Object list(Request req, Response res) {
+        res.type("application/json");
+        return gson.toJson(Map.of("strings",strings));
     }
 
     private void exceptionHandler(DataAccessException ex, Request req, Response res) {

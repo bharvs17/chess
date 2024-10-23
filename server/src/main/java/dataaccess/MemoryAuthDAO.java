@@ -31,13 +31,12 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData getAuth(AuthData authData) throws DataAccessException {
-        return auths.getOrDefault(authData.authToken(), null);
-    }
-
-    @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return auths.get(authToken);
+        if(tokenInDatabase(authToken)) {
+            return auths.get(authToken);
+        } else {
+            throw new DataAccessException(500, "No such auth in database");
+        }
     }
 
     @Override
