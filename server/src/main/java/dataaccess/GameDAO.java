@@ -9,11 +9,11 @@ public interface GameDAO {
 
     public int createGame(String gameName, int gameID) throws DataAccessException;
 
-    public Collection<GameData> getAllGames() throws DataAccessException;
+    public Collection<GameData> getAllGames();
 
     public GameData getGame(int gameID) throws DataAccessException;
 
     public void joinGame(int gameID, ChessGame.TeamColor color, String username) throws DataAccessException;
 
-    public void deleteAll() throws DataAccessException;
+    public void deleteAll();
 }

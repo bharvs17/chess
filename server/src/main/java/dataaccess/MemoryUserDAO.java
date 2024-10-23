@@ -18,7 +18,7 @@ public class MemoryUserDAO implements UserDAO {
         }
         return new AuthData(UUID.randomUUID().toString(),userData.username());
     }
-    //might need to make exceptions more specific (include
+
     @Override
     public UserData getUser(String username, String password) throws DataAccessException {
         if(!users.containsKey(username)) {

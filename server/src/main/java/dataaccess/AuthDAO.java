@@ -8,6 +8,8 @@ public interface AuthDAO {
 
     public void deleteAuth(AuthData authData) throws DataAccessException;
 
+    public void deleteAllAuths();
+
     public AuthData getAuth(AuthData authData) throws DataAccessException;
 
 }
