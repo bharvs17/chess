@@ -16,8 +16,8 @@ public class AuthService {
         authAccess.createAuth(authData);
     }
 
-    public void deleteAuth(AuthData authData) throws DataAccessException {
-        authAccess.deleteAuth(authData);
+    public void deleteAuth(String authToken) throws DataAccessException {
+        authAccess.deleteAuth(authToken);
     }
 
     public void deleteAllAuths() {
@@ -26,6 +26,10 @@ public class AuthService {
 
     public AuthData getAuth(AuthData authData) throws DataAccessException {
         return authAccess.getAuth(authData);
+    }
+
+    public boolean tokenInDatabase(String authToken) {
+        return authAccess.tokenInDatabase(authToken);
     }
 
 }

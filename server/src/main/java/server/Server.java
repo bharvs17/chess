@@ -99,4 +99,15 @@ public class Server {
         }
     }
 
+    private Object logout(Request req, Response res) throws DataAccessException {
+        AuthData authToken = gson.fromJson(req.headers("authorization:"), AuthData.class);
+        if(!authService.tokenInDatabase(authToken.username())) {
+            throw new DataAccessException(500, "No such auth token in database.");
+        } else {
+            authService.deleteAuth(authToken.username());
+            res.status(200);
+            return "";
+        }
+    }
+
 }

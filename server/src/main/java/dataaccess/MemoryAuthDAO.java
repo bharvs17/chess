@@ -17,11 +17,11 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(AuthData authData) throws DataAccessException {
-        if(!auths.containsKey(authData.authToken())) {
+    public void deleteAuth(String authToken) throws DataAccessException {
+        if(!auths.containsKey(authToken)) {
             throw new DataAccessException(500, "No such auth in database");
         } else {
-            auths.remove(authData.authToken());
+            auths.remove(authToken);
         }
     }
 
@@ -31,10 +31,14 @@ public class MemoryAuthDAO implements AuthDAO {
 
     @Override
     public AuthData getAuth(AuthData authData) throws DataAccessException {
-        if(!auths.containsKey(authData.authToken())) {
-            throw new DataAccessException(500, "No such auth in database");
+        return auths.getOrDefault(authData.authToken(), null);
+    }
+
+    public boolean tokenInDatabase(String authToken) {
+        if(auths.containsKey(authToken)) {
+            return true;
         } else {
-            return auths.get(authData.authToken());
+            return false;
         }
     }
 
