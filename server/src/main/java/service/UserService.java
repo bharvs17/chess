@@ -6,7 +6,6 @@ import dataaccess.UserDAO;
 import dataaccess.model.LoginReq;
 import dataaccess.model.RegisterReq;
 import model.AuthData;
-import model.UserData;
 
 public class UserService {
 
@@ -22,20 +21,6 @@ public class UserService {
 
     public AuthData loginUser(LoginReq loginReq) throws DataAccessException {
         return userAccess.loginUser(loginReq);
-    }
-
-    //OLD METHODS BELOW
-
-    public UserData getUser(String username, String password) throws DataAccessException {
-        return userAccess.getUser(username, password);
-    }
-
-    public UserData checkUser(String username) {
-        return userAccess.checkUser(username);
-    }
-
-    public AuthData createUser(UserData userData) throws DataAccessException {
-        return userAccess.createUser(userData);
     }
 
     public void deleteAllUsers() {

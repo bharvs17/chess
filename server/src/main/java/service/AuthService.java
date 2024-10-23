@@ -32,22 +32,8 @@ public class AuthService {
         return authAccess.getUsername(authToken);
     }
 
-    //OLD METHODS BELOW
-
-    public void createAuth(AuthData authData) throws DataAccessException {
-        authAccess.createAuth(authData);
-    }
-
-    public void deleteAuth(String authToken) throws DataAccessException {
-        authAccess.deleteAuth(authToken);
-    }
-
     public void deleteAllAuths() {
         authAccess.deleteAllAuths();
-    }
-
-    public boolean tokenInDatabase(String authToken) {
-        return authAccess.tokenInDatabase(authToken);
     }
 
 }
