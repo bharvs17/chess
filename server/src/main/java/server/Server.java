@@ -7,12 +7,11 @@ import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
+import model.JoinGameReq;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.*;
-
-import java.util.UUID;
 
 public class Server {
 
@@ -100,14 +99,55 @@ public class Server {
     }
 
     private Object logout(Request req, Response res) throws DataAccessException {
-        AuthData authToken = gson.fromJson(req.headers("authorization:"), AuthData.class);
-        if(!authService.tokenInDatabase(authToken.username())) {
+        String authToken = req.headers("authorization:");
+        if(!authService.tokenInDatabase(authToken)) {
             throw new DataAccessException(500, "No such auth token in database.");
         } else {
-            authService.deleteAuth(authToken.username());
+            authService.deleteAuth(authToken);
             res.status(200);
             return "";
         }
+    }
+
+    private Object listGames(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization:");
+        if(!authService.tokenInDatabase(authToken)) {
+            throw new DataAccessException(500, "No such auth token in database.");
+        } else {
+            res.status(200);
+            return gson.toJson(gameService.getAllGames());
+        }
+    }
+
+    private Object createGame(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization:");
+        String gameName = req.body();
+        if(!authService.tokenInDatabase(authToken)) {
+            throw new DataAccessException(500, "No such auth token in database.");
+        } else {
+            res.status(200);
+            return gson.toJson(gameService.createGame(gameName));
+        }
+    }
+
+    private Object joinGame(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization:");
+        JoinGameReq joinGameReq = gson.fromJson(req.body(), JoinGameReq.class);
+        if(!authService.tokenInDatabase(authToken)) {
+            throw new DataAccessException(500, "No such auth token in database.");
+        } else {
+            gameService.getGame(joinGameReq.gameID());
+            res.status(200);
+            gameService.joinGame(joinGameReq.gameID(),joinGameReq.playerColor(),authService.getAuth(authToken).username());
+        }
+        return "";
+    }
+
+    private Object clear(Request req, Response res) throws DataAccessException {
+        userService.deleteAllUsers();
+        authService.deleteAllAuths();
+        gameService.deleteAll();
+        return "";
     }
 
 }

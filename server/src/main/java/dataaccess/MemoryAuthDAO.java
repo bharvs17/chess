@@ -25,6 +25,7 @@ public class MemoryAuthDAO implements AuthDAO {
         }
     }
 
+    @Override
     public void deleteAllAuths() {
         auths.clear();
     }
@@ -34,6 +35,12 @@ public class MemoryAuthDAO implements AuthDAO {
         return auths.getOrDefault(authData.authToken(), null);
     }
 
+    @Override
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        return auths.get(authToken);
+    }
+
+    @Override
     public boolean tokenInDatabase(String authToken) {
         if(auths.containsKey(authToken)) {
             return true;

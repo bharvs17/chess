@@ -10,15 +10,13 @@ import java.util.List;
 public class MemoryGameDAO implements GameDAO {
 
     final private HashMap<Integer, GameData> games = new HashMap<>();
+    private int gameID = 1;
 
     @Override
-    public int createGame(String gameName, int gameID) throws DataAccessException {
-        if(games.containsKey(gameID)) {
-            throw new DataAccessException(500, "Game with that ID already exists.");
-        } else {
-            games.put(gameID, new GameData(gameID, null, null, gameName, new ChessGame()));
-        }
-        return gameID;
+    public int createGame(String gameName) throws DataAccessException {
+        games.put(gameID, new GameData(gameID, null, null, gameName, new ChessGame()));
+        gameID++;
+        return gameID-1;
     }
 
     @Override

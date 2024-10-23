@@ -16,8 +16,8 @@ public class GameService {
         this.gameAccess = gameAccess;
     }
 
-    public int createGame(String gameName, int gameID) throws DataAccessException {
-        return gameAccess.createGame(gameName, gameID);
+    public int createGame(String gameName) throws DataAccessException {
+        return gameAccess.createGame(gameName);
     }
 
     public Collection<GameData> getAllGames() {

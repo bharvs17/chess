@@ -28,6 +28,10 @@ public class AuthService {
         return authAccess.getAuth(authData);
     }
 
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        return authAccess.getAuth(authToken);
+    }
+
     public boolean tokenInDatabase(String authToken) {
         return authAccess.tokenInDatabase(authToken);
     }
