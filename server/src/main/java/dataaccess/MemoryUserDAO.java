@@ -10,6 +10,7 @@ import java.util.UUID;
 public class MemoryUserDAO implements UserDAO {
 
     final private HashMap<String, UserData> users = new HashMap<>();
+    String author = "h";
 
     @Override
     public AuthData registerUser(RegisterReq registerReq) throws DataAccessException {
@@ -31,7 +32,8 @@ public class MemoryUserDAO implements UserDAO {
         } else if(!users.get(loginReq.username()).password().equals(loginReq.password())) {
             throw new DataAccessException(401, "Error: unauthorized");
         } else {
-            return new AuthData(loginReq.username(),UUID.randomUUID().toString());
+            String randUUID = UUID.randomUUID().toString();
+            return new AuthData(loginReq.username(),randUUID);
         }
     }
 

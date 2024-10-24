@@ -342,15 +342,16 @@ public class StandardAPITests {
     @Order(13)
     @DisplayName("Unique Authtoken Each Login")
     public void uniqueAuthorizationTokens() {
+        System.out.printf("inital auth token is %s%n", existingAuth);
         TestAuthResult loginOne = serverFacade.login(existingUser);
         assertHttpOk(loginOne);
         Assertions.assertNotNull(loginOne.getAuthToken(), "Login result did not contain an authToken");
-
+        System.out.printf("first auth token was %s%n",loginOne.getAuthToken()); ////////////////////////////////////
         TestAuthResult loginTwo = serverFacade.login(existingUser);
         Assertions.assertEquals(HttpURLConnection.HTTP_OK, serverFacade.getStatusCode(),
                 "Server response code was not 200 OK");
         Assertions.assertNotNull(loginTwo.getAuthToken(), "Login result did not contain an authToken");
-
+        System.out.printf("second auth token was %s%n", loginTwo.getAuthToken()); //////////////////////////////////
         Assertions.assertNotEquals(existingAuth, loginOne.getAuthToken(),
                 "Authtoken returned by login matched authtoken from prior register");
         Assertions.assertNotEquals(existingAuth, loginTwo.getAuthToken(),
@@ -361,7 +362,6 @@ public class StandardAPITests {
 
         TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
         assertHttpOk(createResult);
-
 
         TestResult logoutResult = serverFacade.logout(existingAuth);
         assertHttpOk(logoutResult);

@@ -7,6 +7,11 @@ import dataaccess.model.JoinGameReq;
 import dataaccess.model.ListGameRes;
 import model.GameData;
 import java.util.HashMap;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Map;
+
+import dataaccess.model.GameInfo;
 
 public class MemoryGameDAO implements GameDAO {
 
@@ -15,7 +20,12 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public ListGameRes listGames() {
-        return new ListGameRes(games.values());
+        Collection<GameInfo> info = new ArrayList<>();
+        for(Map.Entry<Integer,GameData> entry : games.entrySet()) {
+            GameData val = entry.getValue();
+            info.add(new GameInfo(val.gameID(),val.whiteUsername(), val.blackUsername(), val.gameName()));
+        }
+        return new ListGameRes(info);
     }
 
     @Override

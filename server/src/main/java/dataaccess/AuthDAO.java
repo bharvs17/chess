@@ -6,8 +6,6 @@ public interface AuthDAO {
 
     void addAuth(AuthData authData) throws DataAccessException;
 
-    AuthData getAuth(String username) throws DataAccessException;
-
     void logout(String authToken) throws DataAccessException;
 
     void checkAuth(String authToken) throws DataAccessException;

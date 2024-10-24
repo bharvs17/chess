@@ -16,10 +16,6 @@ public class AuthService {
         authAccess.addAuth(authData);
     }
 
-    public AuthData getAuth(String username) throws DataAccessException {
-        return authAccess.getAuth(username);
-    }
-
     public void logout(String authToken) throws DataAccessException {
         authAccess.logout(authToken);
     }

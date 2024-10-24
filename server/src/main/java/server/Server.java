@@ -5,10 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
-import dataaccess.model.CreateGameReq;
-import dataaccess.model.JoinGameReq;
-import dataaccess.model.LoginReq;
-import dataaccess.model.RegisterReq;
+import dataaccess.model.*;
 import model.AuthData;
 import service.AuthService;
 import service.GameService;
@@ -46,7 +43,7 @@ public class Server {
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+        //Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -57,8 +54,12 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private void exceptionHandler(DataAccessException ex, Request req, Response res) {
+    private Object exceptionHandler(DataAccessException ex, Request req, Response res) {
         res.status(ex.StatusCode());
+        res.type("application/json");
+        var body = gson.toJson(new ErrorMsg(ex.getMessage()));
+        res.body(body);
+        return body;
     }
 
     private Object register(Request req, Response res) throws DataAccessException {
@@ -74,33 +75,34 @@ public class Server {
         AuthData authData = userService.loginUser(loginReq);
         authService.addAuth(authData);
         res.status(200);
-        return gson.toJson(authService.getAuth(loginReq.username()));
+        return gson.toJson(authData);
     }
 
     private Object logout(Request req, Response res) throws DataAccessException {
-        String authToken = req.headers("authorization:");
+        String authToken = req.headers("authorization");
         authService.logout(authToken);
         res.status(200);
         return "";
     }
 
     private Object listGames(Request req, Response res) throws DataAccessException {
-        String authToken = req.headers("authorization:");
+        String authToken = req.headers("authorization");
         authService.checkAuth(authToken);
         res.status(200);
         return gson.toJson(gameService.listGames());
     }
 
     private Object createGame(Request req, Response res) throws DataAccessException {
-        String authToken = req.headers("authorization:");
-        authService.checkAuth(authToken);
+        String authToken = req.headers("authorization");
+        System.out.printf("auth token here is %s%n", authToken);
+        authService.checkAuth(authToken); //this is problem
         CreateGameReq gameReq = gson.fromJson(req.body(), CreateGameReq.class);
         res.status(200);
         return gson.toJson(gameService.makeGame(gameReq));
     }
 
     private Object joinGame(Request req, Response res) throws DataAccessException {
-        String authToken = req.headers("authorization:");
+        String authToken = req.headers("authorization");
         authService.checkAuth(authToken);
         JoinGameReq gameReq = gson.fromJson(req.body(), JoinGameReq.class);
         gameService.joinGame(gameReq, authService.getUsername(authToken));

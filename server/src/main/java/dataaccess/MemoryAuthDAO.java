@@ -9,37 +9,19 @@ public class MemoryAuthDAO implements AuthDAO {
     final private HashMap<String, String> auths = new HashMap<>();
 
     @Override
-    public void addAuth(AuthData authData) throws DataAccessException {
-        if(!auths.containsKey(authData.username())) {
-            auths.put(authData.username(), authData.authToken());
-        }
-    }
-
-    @Override
-    public AuthData getAuth(String username) throws DataAccessException {
-        if(!auths.containsKey(username)) {
-            throw new DataAccessException(500, "Error: update status code");
-        } else {
-            return new AuthData(username, auths.get(username));
-        }
+    public void addAuth(AuthData authData) throws DataAccessException { //changed
+        auths.put(authData.authToken(), authData.username());
     }
 
     @Override
     public void logout(String authToken) throws DataAccessException {
         checkAuth(authToken);
-        for(Map.Entry<String,String> entry : auths.entrySet()) {
-            String key = entry.getKey();
-            String val = entry.getValue();
-            if(val.equals(authToken)) {
-                auths.remove(key);
-                break;
-            }
-        }
+        auths.remove(authToken);
     }
 
     @Override
     public void checkAuth(String authToken) throws DataAccessException {
-        if(!auths.containsValue(authToken)) {
+        if(!auths.containsKey(authToken)) {
             throw new DataAccessException(401, "Error: unauthorized");
         }
     }
@@ -47,14 +29,7 @@ public class MemoryAuthDAO implements AuthDAO {
     @Override
     public String getUsername(String authToken) throws DataAccessException {
         checkAuth(authToken);
-        for(Map.Entry<String,String> entry : auths.entrySet()) {
-            String key = entry.getKey();
-            String val = entry.getValue();
-            if(val.equals(authToken)) {
-                return key;
-            }
-        }
-        return null;
+        return auths.get(authToken);
     }
 
     @Override
