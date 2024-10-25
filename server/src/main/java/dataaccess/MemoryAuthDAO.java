@@ -7,10 +7,17 @@ import java.util.Map;
 public class MemoryAuthDAO implements AuthDAO {
 
     final private HashMap<String, String> auths = new HashMap<>();
+    //this is token to username
 
+    //authData is username, token
     @Override
     public void addAuth(AuthData authData) throws DataAccessException { //changed
-        auths.put(authData.authToken(), authData.username());
+        //System.out.printf("authData username: %s authData authToken: %s%n",authData.username(),authData.authToken());
+        if (authData == null) {
+            throw new DataAccessException(500, "authData was null");
+        } else {
+            auths.put(authData.authToken(), authData.username());
+        }
     }
 
     @Override
