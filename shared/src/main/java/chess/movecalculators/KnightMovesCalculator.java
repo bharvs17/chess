@@ -1,4 +1,4 @@
-package chess.move_calculators;
+package chess.movecalculators;
 
 import chess.*;
 
@@ -16,7 +16,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
         int col = position.getColumn();
 
         if(board.getPiece(position).getTeamColor() == ChessGame.TeamColor.WHITE) {
-            //upper
             if(row + 2 <= 8 && col + 1 <= 8) {
                 if(board.getPieceRC(row + 2, col + 1) == null || board.getPieceRC(row + 2, col + 1).getTeamColor() == ChessGame.TeamColor.BLACK) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 2, col + 1), null));
@@ -27,7 +26,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 2, col - 1), null));
                 }
             }
-            //right
             if(row + 1 <= 8 && col + 2 <= 8) {
                 if(board.getPieceRC(row + 1, col + 2) == null || board.getPieceRC(row + 1, col + 2).getTeamColor() == ChessGame.TeamColor.BLACK) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 1, col + 2), null));
@@ -38,7 +36,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
                     validMoves.add(new ChessMove(position, new ChessPosition(row - 1, col + 2), null));
                 }
             }
-            //lower
             if(row - 2 >= 1 && col + 1 <= 8) {
                 if(board.getPieceRC(row - 2, col + 1) == null || board.getPieceRC(row - 2, col + 1).getTeamColor() == ChessGame.TeamColor.BLACK) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row - 2, col + 1), null));
@@ -49,7 +46,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
                     validMoves.add(new ChessMove(position, new ChessPosition(row -2 , col - 1), null));
                 }
             }
-            //left
             if(row + 1 <= 8 && col - 2 >= 1) {
                 if(board.getPieceRC(row + 1, col - 2) == null || board.getPieceRC(row + 1, col - 2).getTeamColor() == ChessGame.TeamColor.BLACK) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 1, col - 2), null));
@@ -61,7 +57,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
                 }
             }
         } else {
-            //upper
             if(row + 2 <= 8 && col + 1 <= 8) {
                 if(board.getPieceRC(row + 2, col + 1) == null || board.getPieceRC(row + 2, col + 1).getTeamColor() == ChessGame.TeamColor.WHITE) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 2, col + 1), null));
@@ -72,7 +67,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 2, col - 1), null));
                 }
             }
-            //right
             if(row + 1 <= 8 && col + 2 <= 8) {
                 if(board.getPieceRC(row + 1, col + 2) == null || board.getPieceRC(row + 1, col + 2).getTeamColor() == ChessGame.TeamColor.WHITE) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 1, col + 2), null));
@@ -83,7 +77,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
                     validMoves.add(new ChessMove(position, new ChessPosition(row - 1, col + 2), null));
                 }
             }
-            //lower
             if(row - 2 >= 1 && col + 1 <= 8) {
                 if(board.getPieceRC(row - 2, col + 1) == null || board.getPieceRC(row - 2, col + 1).getTeamColor() == ChessGame.TeamColor.WHITE) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row - 2, col + 1), null));
@@ -94,7 +87,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
                     validMoves.add(new ChessMove(position, new ChessPosition(row -2 , col - 1), null));
                 }
             }
-            //left
             if(row + 1 <= 8 && col - 2 >= 1) {
                 if(board.getPieceRC(row + 1, col - 2) == null || board.getPieceRC(row + 1, col - 2).getTeamColor() == ChessGame.TeamColor.WHITE) {
                     validMoves.add(new ChessMove(position, new ChessPosition(row + 1, col - 2), null));

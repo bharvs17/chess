@@ -155,8 +155,12 @@ public class ChessGame {
     private ChessPosition getKingPos(ChessBoard board, TeamColor teamColor) {
         for(int r = 1; r <= 8; r++) {
             for(int c = 1; c <= 8; c++) {
-                if(board.getPieceRC(r,c) != null && board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING && board.getPieceRC(r,c).getTeamColor() == teamColor) {
-                    return new ChessPosition(r,c);
+                if(board.getPieceRC(r,c) != null) {
+                    if(board.getPieceRC(r,c).getPieceType() == ChessPiece.PieceType.KING) {
+                        if(board.getPieceRC(r,c).getTeamColor() == teamColor) {
+                            return new ChessPosition(r, c);
+                        }
+                    }
                 }
             }
         }

@@ -52,7 +52,9 @@ public class MemoryGameDAO implements GameDAO {
             if(games.get(reqID).whiteUsername() != null) {
                 throw new DataAccessException(403, "Error: already taken");
             } else {
-                GameData updatedGame = new GameData(reqID,username,games.get(reqID).blackUsername(),games.get(reqID).gameName(),games.get(reqID).game());
+                String bUsername = games.get(reqID).blackUsername();
+                String gName = games.get(reqID).gameName();
+                GameData updatedGame = new GameData(reqID,username,bUsername,gName,games.get(reqID).game());
                 games.remove(reqID);
                 games.put(reqID,updatedGame);
             }
@@ -60,7 +62,9 @@ public class MemoryGameDAO implements GameDAO {
             if(games.get(reqID).blackUsername() != null) {
                 throw new DataAccessException(403, "Error: already taken");
             } else {
-                GameData updatedGame = new GameData(reqID,games.get(reqID).whiteUsername(),username,games.get(reqID).gameName(),games.get(reqID).game());
+                String wUsername = games.get(reqID).blackUsername();
+                String gName = games.get(reqID).gameName();
+                GameData updatedGame = new GameData(reqID,wUsername,username,gName,games.get(reqID).game());
                 games.remove(reqID);
                 games.put(reqID,updatedGame);
             }
