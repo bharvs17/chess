@@ -55,7 +55,7 @@ public class Server {
     }
 
     private Object exceptionHandler(DataAccessException ex, Request req, Response res) {
-        res.status(ex.StatusCode());
+        res.status(ex.statusCode());
         res.type("application/json");
         var body = gson.toJson(new ErrorMsg(ex.getMessage()));
         res.body(body);
