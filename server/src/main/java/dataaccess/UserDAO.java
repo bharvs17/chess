@@ -11,4 +11,5 @@ public interface UserDAO {
     AuthData loginUser(LoginReq loginReq) throws DataAccessException;
 
     void deleteAllUsers();
+
 }

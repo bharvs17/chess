@@ -10,7 +10,6 @@ import java.util.UUID;
 public class MemoryUserDAO implements UserDAO {
 
     final private HashMap<String, UserData> users = new HashMap<>();
-    String author = "h";
 
     @Override
     public AuthData registerUser(RegisterReq registerReq) throws DataAccessException {
