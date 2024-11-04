@@ -16,6 +16,6 @@ public class Main {
         //chessServer.run(8080);
 
        SQLUserDAO dao = new SQLUserDAO();
-       dao.deleteAllUsers();
+       System.out.println(dao.loginUser(new LoginReq("bharvey","mypass")));
     }
 }

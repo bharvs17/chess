@@ -3,6 +3,8 @@ package dataaccess;
 import dataaccess.model.LoginReq;
 import dataaccess.model.RegisterReq;
 import model.AuthData;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.*;
 import java.util.UUID;
 
@@ -69,8 +71,9 @@ public class SQLUserDAO implements UserDAO {
         try(var conn = DatabaseManager.getConnection()) {
             var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
             try(var ps = conn.prepareStatement(statement)) {
+                String hashedPass = BCrypt.hashpw(password,BCrypt.gensalt());
                 ps.setString(1,username);
-                ps.setString(2,password);
+                ps.setString(2,hashedPass);
                 ps.setString(3,email);
                 ps.executeUpdate();
             }
@@ -100,7 +103,7 @@ public class SQLUserDAO implements UserDAO {
         } catch(Exception e) {
             throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
         }
-        if(givenPass.equals(password)) {
+        if(BCrypt.checkpw(givenPass, password)) {
             String uuid = UUID.randomUUID().toString();
             return new AuthData(username,uuid);
         } else {
