@@ -89,13 +89,65 @@ public class SQLGameDAO implements GameDAO {
         } catch(Exception e) {
             throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
         }
-
         return null;
     }
 
     @Override
     public void joinGame(JoinGameReq gameReq, String username) throws DataAccessException {
+        ChessGame.TeamColor reqColor = gameReq.playerColor();
+        int reqID = gameReq.gameID();
+        String wUser = null;
+        String bUser = null;
+        if(reqID <= 0 || !(reqColor == ChessGame.TeamColor.BLACK || reqColor == ChessGame.TeamColor.WHITE)) {
+            throw new DataAccessException(400, "Error: bad request");
+        }
+        try(var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM games WHERE gameID = ?";
+            try(var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1,reqID);
+                try(var rs = ps.executeQuery()) {
+                    if(rs.next()) {
+                        wUser = rs.getString("whiteusername");
+                        bUser = rs.getString("blackusername");
+                    } else {
+                        throw new DataAccessException(401, "Error: unauthorized");
+                    }
+                }
+            }
+        } catch(Exception e) {
+            throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
+        }
+        if(reqColor == ChessGame.TeamColor.WHITE) {
+            if(wUser != null) {
+                throw new DataAccessException(403, "Error: already taken");
+            } else {
+                addUser(reqID,username,reqColor);
+            }
+        } else {
+            if(bUser != null) {
+                throw new DataAccessException(403, "Error: already taken");
+            } else {
+                addUser(reqID,username,reqColor);
+            }
+        }
+    }
 
+    private void addUser(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
+        try(var conn = DatabaseManager.getConnection()) {
+            String statement;
+            if(color == ChessGame.TeamColor.WHITE) {
+                statement = "UPDATE games SET whiteusername = ? WHERE gameID = ?";
+            } else {
+                statement = "UPDATE games SET blackusername = ? WHERE gameID = ?";
+            }
+            try(var ps = conn.prepareStatement(statement)) {
+                ps.setString(1,username);
+                ps.setInt(2,gameID);
+                ps.executeUpdate();
+            }
+        } catch(Exception e) {
+            throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
+        }
     }
 
     @Override

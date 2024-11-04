@@ -1,6 +1,7 @@
 import chess.*;
 import dataaccess.*;
 import dataaccess.model.CreateGameReq;
+import dataaccess.model.JoinGameReq;
 import dataaccess.model.LoginReq;
 import dataaccess.model.RegisterReq;
 import model.AuthData;
@@ -21,8 +22,8 @@ public class Main {
         /*SQLAuthDAO dao = new SQLAuthDAO();
         dao.deleteAllAuths();*/
 
-        SQLGameDAO dao = new SQLGameDAO();
-        dao.deleteAllGames();
+        /*SQLGameDAO dao = new SQLGameDAO();
+        dao.joinGame(new JoinGameReq(ChessGame.TeamColor.BLACK,1),"con2");*/
 
     }
 }
