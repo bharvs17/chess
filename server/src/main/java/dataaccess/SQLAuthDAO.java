@@ -18,22 +18,9 @@ public class SQLAuthDAO implements AuthDAO {
             """
     };
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            //conn.setCatalog("chess");
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
-
     public SQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+        DatabaseInit init = new DatabaseInit();
+        init.configureDatabase(createStatements);
     }
 
     @Override
@@ -71,21 +58,22 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void checkAuth(String authToken) throws DataAccessException {
+        int count = 0;
         try(var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT COUNT(*) FROM auths WHERE authtoken = ?";
             try(var ps = conn.prepareStatement(statement)) {
                 ps.setString(1,authToken);
                 try(var rs = ps.executeQuery()) {
                     if(rs.next()) {
-                        int count = rs.getInt(1);
-                        if(count == 0) {
-                            throw new DataAccessException(401, "Error: unauthorized");
-                        }
-                    } //maybe put else and throw exception here
+                        count = rs.getInt(1);
+                    }
                 }
             }
         } catch(Exception e) {
             throw new DataAccessException(401, String.format("Unable to read data: %s%n",e.getMessage()));
+        }
+        if(count == 0) {
+            throw new DataAccessException(401, "Error: unauthorized");
         }
     }
 

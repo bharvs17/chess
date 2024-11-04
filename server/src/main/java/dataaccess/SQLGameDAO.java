@@ -28,22 +28,9 @@ public class SQLGameDAO implements GameDAO {
             """
     };
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            //conn.setCatalog("chess");
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
-
     public SQLGameDAO() throws DataAccessException {
-        configureDatabase();
+        DatabaseInit init = new DatabaseInit();
+        init.configureDatabase(createStatements);
         gson = new Gson();
     }
 

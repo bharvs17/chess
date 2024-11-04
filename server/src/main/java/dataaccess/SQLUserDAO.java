@@ -23,22 +23,9 @@ public class SQLUserDAO implements UserDAO {
             """
     };
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            //conn.setCatalog("chess");
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
-
     public SQLUserDAO() throws DataAccessException {
-        configureDatabase();
+        DatabaseInit init = new DatabaseInit();
+        init.configureDatabase(createStatements);
     }
 
     @Override
@@ -49,6 +36,7 @@ public class SQLUserDAO implements UserDAO {
         String username = registerReq.username();
         String password = registerReq.password();
         String email = registerReq.email();
+        int count = 0;
         //check if username in database
         try(var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT COUNT(*) FROM users WHERE username = ?";
@@ -56,16 +44,15 @@ public class SQLUserDAO implements UserDAO {
                 ps.setString(1,username);
                 try(var rs = ps.executeQuery()) {
                     if(rs.next()) {
-                        int count = rs.getInt(1);
-                        if(count > 0) {
-                            throw new DataAccessException(403, "Error: Username already exists in database");
-                        }
+                        count = rs.getInt(1);
                     }
                 }
             }
         } catch(Exception e) {
-            System.out.println("this runs");
             throw new DataAccessException(403, e.getMessage());
+        }
+        if(count > 0) {
+            throw new DataAccessException(403, "Error: Username already exists in database");
         }
         //add to database
         try(var conn = DatabaseManager.getConnection()) {
