@@ -24,7 +24,11 @@ public class UserService {
     }
 
     public void deleteAllUsers() {
-        userAccess.deleteAllUsers();
+        try {
+            userAccess.deleteAllUsers();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
