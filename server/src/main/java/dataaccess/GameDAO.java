@@ -7,12 +7,12 @@ import dataaccess.model.ListGameRes;
 
 public interface GameDAO {
 
-    ListGameRes listGames();
+    ListGameRes listGames() throws DataAccessException;
 
     CreateGameRes makeGame(CreateGameReq gameReq) throws DataAccessException;
 
     void joinGame(JoinGameReq gameReq, String username) throws DataAccessException;
 
-    void deleteAllGames();
+    void deleteAllGames() throws DataAccessException;
 
 }

@@ -1,8 +1,6 @@
 import chess.*;
-import dataaccess.DataAccessException;
-import dataaccess.SQLAuthDAO;
-import dataaccess.SQLUserDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
+import dataaccess.model.CreateGameReq;
 import dataaccess.model.LoginReq;
 import dataaccess.model.RegisterReq;
 import model.AuthData;
@@ -23,6 +21,8 @@ public class Main {
         /*SQLAuthDAO dao = new SQLAuthDAO();
         dao.deleteAllAuths();*/
 
+        SQLGameDAO dao = new SQLGameDAO();
+        dao.deleteAllGames();
 
     }
 }

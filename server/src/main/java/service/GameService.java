@@ -16,7 +16,11 @@ public class GameService {
     }
 
     public ListGameRes listGames() {
-        return gameAccess.listGames();
+        try {
+            return gameAccess.listGames();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public CreateGameRes makeGame(CreateGameReq gameReq) throws DataAccessException {
@@ -28,7 +32,11 @@ public class GameService {
     }
 
     public void deleteAllGames() {
-        gameAccess.deleteAllGames();
+        try {
+            gameAccess.deleteAllGames();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

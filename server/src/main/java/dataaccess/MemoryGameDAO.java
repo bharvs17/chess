@@ -19,7 +19,7 @@ public class MemoryGameDAO implements GameDAO {
     private int gameID = 1;
 
     @Override
-    public ListGameRes listGames() {
+    public ListGameRes listGames() throws DataAccessException {
         Collection<GameInfo> info = new ArrayList<>();
         for(Map.Entry<Integer,GameData> entry : games.entrySet()) {
             GameData val = entry.getValue();
@@ -72,7 +72,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void deleteAllGames() {
+    public void deleteAllGames() throws DataAccessException {
         games.clear();
     }
 
