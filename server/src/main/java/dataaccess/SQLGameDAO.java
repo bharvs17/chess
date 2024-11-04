@@ -158,7 +158,7 @@ public class SQLGameDAO implements GameDAO {
                 ps.executeUpdate();
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to perform request: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("Unable to perform request: %s%n",e.getMessage()));
         }
     }
 

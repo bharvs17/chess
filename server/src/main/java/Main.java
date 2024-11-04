@@ -16,14 +16,6 @@ public class Main {
         Server chessServer = new Server();
         chessServer.run(8080);
 
-       /*SQLUserDAO udao = new SQLUserDAO();
-       udao.deleteAllUsers();
-
-        SQLAuthDAO adao = new SQLAuthDAO();
-        adao.deleteAllAuths();
-
-        SQLGameDAO gdao = new SQLGameDAO();
-        gdao.deleteAllGames();*/
 
     }
 }

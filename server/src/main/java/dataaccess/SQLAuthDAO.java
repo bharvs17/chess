@@ -51,7 +51,7 @@ public class SQLAuthDAO implements AuthDAO {
                 ps.executeUpdate();
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("Unable to read data: %s%n",e.getMessage()));
         }
     }
 
@@ -65,7 +65,7 @@ public class SQLAuthDAO implements AuthDAO {
                 ps.executeUpdate();
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("Unable to read data: %s%n",e.getMessage()));
         }
     }
 
@@ -85,7 +85,7 @@ public class SQLAuthDAO implements AuthDAO {
                 }
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("Unable to read data: %s%n",e.getMessage()));
         }
     }
 
@@ -104,7 +104,7 @@ public class SQLAuthDAO implements AuthDAO {
                 }
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("unable to read data: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("unable to read data: %s%n",e.getMessage()));
         }
         return username;
     }
@@ -117,7 +117,7 @@ public class SQLAuthDAO implements AuthDAO {
                 ps.executeUpdate();
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to perform request: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("Unable to perform request: %s%n",e.getMessage()));
         }
     }
 

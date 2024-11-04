@@ -9,6 +9,8 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.sql.SQLException;
+
 public class Server {
 
     private final Gson gson;

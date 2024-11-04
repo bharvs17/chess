@@ -7,6 +7,8 @@ import dataaccess.model.LoginReq;
 import dataaccess.model.RegisterReq;
 import model.AuthData;
 
+import java.sql.SQLException;
+
 public class UserService {
 
     private final UserDAO userAccess;

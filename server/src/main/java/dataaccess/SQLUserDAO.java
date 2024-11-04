@@ -58,13 +58,14 @@ public class SQLUserDAO implements UserDAO {
                     if(rs.next()) {
                         int count = rs.getInt(1);
                         if(count > 0) {
-                            throw new DataAccessException(403, "Username already exists in database");
+                            throw new DataAccessException(403, "Error: Username already exists in database");
                         }
-                    } //may need to put else and throw exception here
+                    }
                 }
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
+            System.out.println("this runs");
+            throw new DataAccessException(403, e.getMessage());
         }
         //add to database
         try(var conn = DatabaseManager.getConnection()) {
@@ -100,7 +101,7 @@ public class SQLUserDAO implements UserDAO {
                 }
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("Unable to read data: %s%n",e.getMessage()));
         }
         if(BCrypt.checkpw(givenPass, password)) {
             String uuid = UUID.randomUUID().toString();
@@ -118,7 +119,7 @@ public class SQLUserDAO implements UserDAO {
                 ps.executeUpdate();
             }
         } catch(Exception e) {
-            throw new DataAccessException(500, String.format("Unable to perform request: %s%n",e.getMessage()));
+            throw new DataAccessException(401, String.format("Unable to perform request: %s%n",e.getMessage()));
         }
     }
 
