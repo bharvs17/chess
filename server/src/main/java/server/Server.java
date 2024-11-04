@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import dataaccess.model.*;
 import model.AuthData;
 import service.AuthService;
@@ -21,9 +18,13 @@ public class Server {
 
     public Server() {
         this.gson = new Gson();
-        this.userService = new UserService(new MemoryUserDAO());
-        this.authService = new AuthService(new MemoryAuthDAO());
-        this.gameService = new GameService(new MemoryGameDAO());
+        try {
+            this.userService = new UserService(new SQLUserDAO());
+            this.authService = new AuthService(new SQLAuthDAO());
+            this.gameService = new GameService(new SQLGameDAO());
+        } catch(DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
     //plus services for auth and game
 

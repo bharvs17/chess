@@ -13,17 +13,17 @@ public class Main {
         //var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         //System.out.println("♕ 240 Chess Server: " + piece);
 
-        //Server chessServer = new Server();
-        //chessServer.run(8080);
+        Server chessServer = new Server();
+        chessServer.run(8080);
 
-       /*SQLUserDAO dao = new SQLUserDAO();
-       System.out.println(dao.loginUser(new LoginReq("bharvey","mypass")));*/
+       /*SQLUserDAO udao = new SQLUserDAO();
+       udao.deleteAllUsers();
 
-        /*SQLAuthDAO dao = new SQLAuthDAO();
-        dao.deleteAllAuths();*/
+        SQLAuthDAO adao = new SQLAuthDAO();
+        adao.deleteAllAuths();
 
-        /*SQLGameDAO dao = new SQLGameDAO();
-        dao.joinGame(new JoinGameReq(ChessGame.TeamColor.BLACK,1),"con2");*/
+        SQLGameDAO gdao = new SQLGameDAO();
+        gdao.deleteAllGames();*/
 
     }
 }

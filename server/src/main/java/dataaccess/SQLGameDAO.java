@@ -89,7 +89,7 @@ public class SQLGameDAO implements GameDAO {
         } catch(Exception e) {
             throw new DataAccessException(500, String.format("Unable to read data: %s%n",e.getMessage()));
         }
-        return null;
+        return new CreateGameRes(gameIDCount-1);
     }
 
     @Override

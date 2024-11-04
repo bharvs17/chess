@@ -1,14 +1,15 @@
 package service;
 
+import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import model.AuthData;
 
 public class AuthService {
 
-    private final MemoryAuthDAO authAccess;
+    private final AuthDAO authAccess;
 
-    public AuthService(MemoryAuthDAO authAccess) {
+    public AuthService(AuthDAO authAccess) {
         this.authAccess = authAccess;
     }
 
