@@ -29,7 +29,6 @@ public class SQLUserDAO implements UserDAO {
             conn.setCatalog("chess");
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
-                    System.out.printf("statement is: %s%n", statement);
                     preparedStatement.executeUpdate();
                 }
             }
@@ -61,7 +60,7 @@ public class SQLUserDAO implements UserDAO {
                         if(count > 0) {
                             throw new DataAccessException(403, "Username already exists in database");
                         }
-                    }
+                    } //may need to put else and throw exception here
                 }
             }
         } catch(Exception e) {
