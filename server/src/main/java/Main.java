@@ -2,6 +2,7 @@ import chess.*;
 import dataaccess.DataAccessException;
 import dataaccess.SQLUserDAO;
 import dataaccess.UserDAO;
+import dataaccess.model.RegisterReq;
 import server.Server;
 import service.UserService;
 
@@ -14,6 +15,6 @@ public class Main {
         //chessServer.run(8080);
 
        SQLUserDAO dao = new SQLUserDAO();
-
+       dao.registerUser(new RegisterReq("bharvey","pass","bh@gmail.com"));
     }
 }
