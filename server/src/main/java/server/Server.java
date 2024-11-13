@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
-import dataaccess.model.*;
+
 import model.AuthData;
 import service.AuthService;
 import service.GameService;
