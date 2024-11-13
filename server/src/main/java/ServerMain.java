@@ -1,14 +1,7 @@
-import chess.*;
 import dataaccess.*;
-import dataaccess.model.CreateGameReq;
-import dataaccess.model.JoinGameReq;
-import dataaccess.model.LoginReq;
-import dataaccess.model.RegisterReq;
-import model.AuthData;
 import server.Server;
-import service.UserService;
 
-public class Main {
+public class ServerMain {
     public static void main(String[] args) throws DataAccessException {
         //var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         //System.out.println("♕ 240 Chess Server: " + piece);
