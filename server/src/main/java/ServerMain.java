@@ -1,5 +1,6 @@
 import dataaccess.*;
 import server.Server;
+import exception.DataAccessException;
 
 public class ServerMain {
     public static void main(String[] args) throws DataAccessException {

@@ -3,7 +3,7 @@ package dataaccess;
 import model.LoginReq;
 import model.RegisterReq;
 import model.AuthData;
-
+import exception.DataAccessException;
 import java.sql.SQLException;
 
 public interface UserDAO {

@@ -1,7 +1,7 @@
 package service;
 
 
-import dataaccess.DataAccessException;
+import exception.DataAccessException;
 import dataaccess.UserDAO;
 import model.LoginReq;
 import model.RegisterReq;

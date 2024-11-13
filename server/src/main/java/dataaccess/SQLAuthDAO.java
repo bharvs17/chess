@@ -1,7 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
-
+import exception.DataAccessException;
 import java.sql.SQLException;
 
 public class SQLAuthDAO implements AuthDAO {

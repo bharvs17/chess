@@ -4,7 +4,7 @@ import model.LoginReq;
 import model.RegisterReq;
 import model.AuthData;
 import org.mindrot.jbcrypt.BCrypt;
-
+import exception.DataAccessException;
 import java.sql.*;
 import java.util.UUID;
 

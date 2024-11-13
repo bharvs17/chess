@@ -1,6 +1,7 @@
 package dataaccess;
 
 import java.sql.SQLException;
+import exception.DataAccessException;
 
 public class DatabaseInit {
 

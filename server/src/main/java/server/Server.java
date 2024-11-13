@@ -8,6 +8,7 @@ import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.*;
+import exception.DataAccessException;
 
 import java.sql.SQLException;
 

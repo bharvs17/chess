@@ -4,6 +4,7 @@ import model.CreateGameReq;
 import model.CreateGameRes;
 import model.JoinGameReq;
 import model.ListGameRes;
+import exception.DataAccessException;
 
 public interface GameDAO {
 

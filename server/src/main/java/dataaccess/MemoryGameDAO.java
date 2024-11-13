@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Map;
+import exception.DataAccessException;
 
 import model.GameInfo;
 

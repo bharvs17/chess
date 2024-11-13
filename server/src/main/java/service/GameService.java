@@ -1,6 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
+import exception.DataAccessException;
 import dataaccess.GameDAO;
 import model.CreateGameReq;
 import model.CreateGameRes;

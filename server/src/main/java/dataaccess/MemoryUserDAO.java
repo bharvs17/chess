@@ -6,6 +6,7 @@ import model.AuthData;
 import model.UserData;
 import java.util.HashMap;
 import java.util.UUID;
+import exception.DataAccessException;
 
 public class MemoryUserDAO implements UserDAO {
 
