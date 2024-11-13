@@ -3,10 +3,10 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryGameDAO;
-import dataaccess.model.CreateGameReq;
-import dataaccess.model.GameInfo;
-import dataaccess.model.JoinGameReq;
-import dataaccess.model.ListGameRes;
+import model.CreateGameReq;
+import model.GameInfo;
+import model.JoinGameReq;
+import model.ListGameRes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

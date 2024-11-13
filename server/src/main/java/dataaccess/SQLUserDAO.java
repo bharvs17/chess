@@ -1,7 +1,7 @@
 package dataaccess;
 
-import dataaccess.model.LoginReq;
-import dataaccess.model.RegisterReq;
+import model.LoginReq;
+import model.RegisterReq;
 import model.AuthData;
 import org.mindrot.jbcrypt.BCrypt;
 

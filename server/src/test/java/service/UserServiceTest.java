@@ -2,8 +2,8 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.MemoryUserDAO;
-import dataaccess.model.LoginReq;
-import dataaccess.model.RegisterReq;
+import model.LoginReq;
+import model.RegisterReq;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

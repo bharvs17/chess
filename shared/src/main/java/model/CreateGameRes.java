@@ -1,4 +1,4 @@
-package dataaccess.model;
+package model;
 
 public record CreateGameRes(int gameID) {
 }

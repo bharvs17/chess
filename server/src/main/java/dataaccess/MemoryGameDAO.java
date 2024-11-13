@@ -1,17 +1,17 @@
 package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.model.CreateGameReq;
-import dataaccess.model.CreateGameRes;
-import dataaccess.model.JoinGameReq;
-import dataaccess.model.ListGameRes;
+import model.CreateGameReq;
+import model.CreateGameRes;
+import model.JoinGameReq;
+import model.ListGameRes;
 import model.GameData;
 import java.util.HashMap;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Map;
 
-import dataaccess.model.GameInfo;
+import model.GameInfo;
 
 public class MemoryGameDAO implements GameDAO {
 

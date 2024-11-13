@@ -1,8 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.model.CreateGameReq;
-import dataaccess.model.JoinGameReq;
+import model.CreateGameReq;
+import model.JoinGameReq;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

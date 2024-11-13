@@ -3,8 +3,8 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
-import dataaccess.model.LoginReq;
-import dataaccess.model.RegisterReq;
+import model.LoginReq;
+import model.RegisterReq;
 import model.AuthData;
 
 import java.sql.SQLException;

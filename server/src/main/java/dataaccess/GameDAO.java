@@ -1,9 +1,9 @@
 package dataaccess;
 
-import dataaccess.model.CreateGameReq;
-import dataaccess.model.CreateGameRes;
-import dataaccess.model.JoinGameReq;
-import dataaccess.model.ListGameRes;
+import model.CreateGameReq;
+import model.CreateGameRes;
+import model.JoinGameReq;
+import model.ListGameRes;
 
 public interface GameDAO {
 

@@ -1,4 +1,4 @@
-
+import model.*;
 
 public class ServerFacade {
 
@@ -8,6 +8,8 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public AuthData register(RegisterReq req) {
 
+    }
 
 }
