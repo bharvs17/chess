@@ -1,4 +1,5 @@
 import model.*;
+import
 
 public class ServerFacade {
 
@@ -9,6 +10,11 @@ public class ServerFacade {
     }
 
     public AuthData register(RegisterReq req) {
+        String path = "/user";
+
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws  {
 
     }
 
