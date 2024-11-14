@@ -8,39 +8,44 @@ import java.net.*;
 public class ServerFacade {
 
     private final String serverUrl;
+    private final String authToken;
 
-    public ServerFacade(String url) {
+    public ServerFacade(String url, String token) {
         serverUrl = url;
+        authToken = token;
     }
 
     public AuthData register(RegisterReq req) throws DataAccessException {
         String path = "/user";
-        return this.makeRequest("POST", path, req, AuthData.class);
+        return this.makeRequest("POST", path, authToken, req, AuthData.class);
     }
 
     public AuthData login(LoginReq req) throws DataAccessException {
         String path = "/session";
-        return this.makeRequest("POST", path, req, AuthData.class);
+        return this.makeRequest("POST", path, authToken, req, AuthData.class);
     }
 
     public void logout() throws DataAccessException {
         String path = "/session";
-        //need to figure out how to do this
+        this.makeRequest("DELETE", path, authToken, null, null);
     }
 
     public ListGameRes listGames() throws DataAccessException {
         String path = "/game";
+        return this.makeRequest("GET", path, authToken, null, ListGameRes.class);
     }
 
     public CreateGameRes createGame(CreateGameReq req) throws DataAccessException {
         String path = "/game";
+        return this.makeRequest("POST", path, authToken, req, CreateGameRes.class);
     }
 
     public void joinGame(JoinGameReq req) throws DataAccessException {
         String path = "/game";
+        this.makeRequest("PUT", path, authToken, req, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
+    private <T> T makeRequest(String method, String path, String token, Object request, Class<T> responseClass) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -49,6 +54,7 @@ public class ServerFacade {
             //http.addRequestProperty("authorization", authToken); add header with authToken under name "authorization"
             //probably store authToken as a private final string and add it to header for all methods that need it
             //look more in depth at server class to see how it handles authTokens/headers, but probably do above
+            http.addRequestProperty("authorization", token);
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);
