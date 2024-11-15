@@ -56,9 +56,6 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-            //http.addRequestProperty("authorization", authToken); add header with authToken under name "authorization"
-            //probably store authToken as a private final string and add it to header for all methods that need it
-            //look more in depth at server class to see how it handles authTokens/headers, but probably do above
             http.addRequestProperty("authorization", token);
             writeBody(request, http);
             http.connect();
