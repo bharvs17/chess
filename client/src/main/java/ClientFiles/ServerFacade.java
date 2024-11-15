@@ -1,3 +1,5 @@
+package ClientFiles;
+
 import com.google.gson.Gson;
 import model.*;
 import exception.DataAccessException;
@@ -8,21 +10,24 @@ import java.net.*;
 public class ServerFacade {
 
     private final String serverUrl;
-    private final String authToken;
+    private String authToken;
 
-    public ServerFacade(String url, String token) {
+    public ServerFacade(String url) {
         serverUrl = url;
-        authToken = token;
     }
 
     public AuthData register(RegisterReq req) throws DataAccessException {
         String path = "/user";
-        return this.makeRequest("POST", path, authToken, req, AuthData.class);
+        AuthData data = this.makeRequest("POST", path, authToken, req, AuthData.class);
+        authToken = data.authToken();
+        return data;
     }
 
     public AuthData login(LoginReq req) throws DataAccessException {
         String path = "/session";
-        return this.makeRequest("POST", path, authToken, req, AuthData.class);
+        AuthData data = this.makeRequest("POST", path, authToken, req, AuthData.class);
+        authToken = data.authToken();
+        return data;
     }
 
     public void logout() throws DataAccessException {

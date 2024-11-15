@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import exception.DataAccessException;
 import model.CreateGameReq;
 import model.JoinGameReq;
 import org.junit.jupiter.api.Assertions;

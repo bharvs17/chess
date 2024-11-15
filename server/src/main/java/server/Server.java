@@ -121,4 +121,12 @@ public class Server {
         return "";
     }
 
+    public void clearAll(String password) {
+        if(password.equals("password")) {
+            userService.deleteAllUsers();
+            authService.deleteAllAuths();
+            gameService.deleteAllGames();
+        }
+    }
+
 }
