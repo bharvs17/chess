@@ -1,4 +1,4 @@
-package ClientFiles;
+package clientfiles;
 
 import com.google.gson.Gson;
 import model.*;

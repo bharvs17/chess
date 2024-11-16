@@ -1,4 +1,4 @@
-package ClientFiles;
+package clientfiles;
 
 import chess.ChessGame;
 import exception.DataAccessException;
@@ -6,7 +6,6 @@ import model.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 
 public class ChessClient {
 
@@ -182,7 +181,6 @@ public class ChessClient {
                 return result;
                 //print out board (start with above message then append board to string and return that)
             } catch(Exception ex) {
-                System.out.println(ex.getMessage());
                 throw new DataAccessException(400, "Error joining game: game may not exist or your color was taken by another player\n");
             }
         } else {
@@ -208,12 +206,6 @@ public class ChessClient {
     private void assertSignedIn() throws DataAccessException {
         if(state != State.SIGNEDIN) {
             throw new DataAccessException(400, "You must be logged in and not in a game to do that.\n");
-        }
-    }
-
-    private void assertInGame() throws DataAccessException {
-        if(state != State.INGAME) {
-            throw new DataAccessException(400, "You must be in a game for this command\n");
         }
     }
 

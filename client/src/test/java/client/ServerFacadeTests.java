@@ -8,7 +8,7 @@ import model.LoginReq;
 import model.RegisterReq;
 import org.junit.jupiter.api.*;
 import server.Server;
-import ClientFiles.ServerFacade;
+import clientfiles.ServerFacade;
 
 public class ServerFacadeTests {
 
@@ -18,9 +18,10 @@ public class ServerFacadeTests {
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(8080);
+        var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade("http://localhost:8080");
+        String serverUrl = String.format("http://localhost:%d", port);
+        facade = new ServerFacade(serverUrl);
     }
 
     @AfterAll
@@ -109,6 +110,23 @@ public class ServerFacadeTests {
         facade.register(new RegisterReq("user","pass","email"));
         facade.createGame(new CreateGameReq("mygame"));
         Assertions.assertDoesNotThrow(() -> facade.joinGame(new JoinGameReq(ChessGame.TeamColor.WHITE,1)));
+    }
+
+    @Test
+    public void deleteAllInvalid() throws DataAccessException {
+        facade.register(new RegisterReq("user","pass","email"));
+        facade.createGame(new CreateGameReq("game"));
+        facade.logout();
+        facade.deleteAll();
+        Assertions.assertThrows(DataAccessException.class, () -> facade.login(new LoginReq("user","pass")));
+    }
+
+    @Test
+    public void deleteAllValid() throws DataAccessException {
+        facade.register(new RegisterReq("user","pass","email"));
+        facade.createGame(new CreateGameReq("game"));
+        facade.logout();
+        Assertions.assertDoesNotThrow(() -> facade.deleteAll());
     }
 
 }

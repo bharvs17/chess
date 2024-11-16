@@ -1,4 +1,4 @@
-package ClientFiles;
+package clientfiles;
 
 public enum State {
     SIGNEDOUT,

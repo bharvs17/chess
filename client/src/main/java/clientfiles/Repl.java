@@ -1,4 +1,4 @@
-package ClientFiles;
+package clientfiles;
 
 import java.util.Scanner;
 

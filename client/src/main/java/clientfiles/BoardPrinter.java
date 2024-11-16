@@ -1,4 +1,4 @@
-package ClientFiles;
+package clientfiles;
 
 import chess.ChessBoard;
 import chess.ChessGame;

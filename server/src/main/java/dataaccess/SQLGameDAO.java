@@ -35,7 +35,7 @@ public class SQLGameDAO implements GameDAO {
         //set gameIDCount to highest gameID found in database + 1
         try(var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT MAX(gameID) AS max_value FROM games";
-            try(var ps = conn.prepareStatement(statement)) {
+            var ps = conn.prepareStatement(statement);
                 try(var rs = ps.executeQuery()) {
                     if(rs.next()) {
                         int maxGameID = rs.getInt("max_value");
@@ -44,7 +44,6 @@ public class SQLGameDAO implements GameDAO {
                         gameIDCount = 1;
                     }
                 }
-            }
         } catch(Exception e) {
             throw new DataAccessException(500, "Something went wrong configuring gameIDs");
         }

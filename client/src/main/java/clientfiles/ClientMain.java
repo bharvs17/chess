@@ -1,6 +1,4 @@
-package ClientFiles;
-
-import chess.*;
+package clientfiles;
 
 public class ClientMain {
     public static void main(String[] args) {
