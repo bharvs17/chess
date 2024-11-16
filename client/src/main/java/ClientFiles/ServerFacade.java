@@ -50,6 +50,11 @@ public class ServerFacade {
         this.makeRequest("PUT", path, authToken, req, null);
     }
 
+    public void deleteAll() throws DataAccessException {
+        String path = "/db";
+        this.makeRequest("DELETE", path, authToken, null, null);
+    }
+
     private <T> T makeRequest(String method, String path, String token, Object request, Class<T> responseClass) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();

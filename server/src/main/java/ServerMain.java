@@ -10,6 +10,5 @@ public class ServerMain {
         Server chessServer = new Server();
         chessServer.run(8080);
 
-
     }
 }

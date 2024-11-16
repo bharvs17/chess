@@ -12,7 +12,7 @@ public class Repl {
 
     public void run() {
         System.out.println("Welcome to chess. Register or login to start.");
-        //print out help
+        System.out.print(client.help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while(!result.equals("quit")) {
@@ -20,13 +20,14 @@ public class Repl {
             String line = scanner.nextLine();
             try {
                 result = client.eval(line);
-                System.out.print(result); //also make sure goes to next line and looks good
+                System.out.print(result);
             } catch(Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
             }
         }
         System.out.println();
+        System.out.println("Quitting chess application.");
     }
 
 }

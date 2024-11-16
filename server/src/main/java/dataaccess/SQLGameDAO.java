@@ -11,7 +11,7 @@ import java.util.Collection;
 
 public class SQLGameDAO implements GameDAO {
 
-    private int gameIDCount = 1;
+    private int gameIDCount;
     private final Gson gson;
 
     private final String[] createStatements = {
@@ -32,6 +32,22 @@ public class SQLGameDAO implements GameDAO {
         DatabaseInit init = new DatabaseInit();
         init.configureDatabase(createStatements);
         gson = new Gson();
+        //set gameIDCount to highest gameID found in database + 1
+        try(var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT MAX(gameID) AS max_value FROM games";
+            try(var ps = conn.prepareStatement(statement)) {
+                try(var rs = ps.executeQuery()) {
+                    if(rs.next()) {
+                        int maxGameID = rs.getInt("max_value");
+                        gameIDCount = maxGameID+1;
+                    } else {
+                        gameIDCount = 1;
+                    }
+                }
+            }
+        } catch(Exception e) {
+            throw new DataAccessException(500, "Something went wrong configuring gameIDs");
+        }
     }
 
     @Override
@@ -143,6 +159,7 @@ public class SQLGameDAO implements GameDAO {
             var statement = "TRUNCATE games";
             try(var ps = conn.prepareStatement(statement)) {
                 ps.executeUpdate();
+                gameIDCount = 1;
             }
         } catch(Exception e) {
             throw new DataAccessException(401, String.format("Unable to perform request: %s%n",e.getMessage()));
