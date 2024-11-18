@@ -34,7 +34,7 @@ public class ChessClient {
                 case "play" -> playGame(params);
                 case "observe" -> observeGame(params);
                 case "quit" -> "quit";
-                default -> help();
+                default -> help(); //connect to unknown command method and say it's an unknown command, then print out the help commands
             };
         } catch (DataAccessException ex) {
             return ex.getMessage();
@@ -113,6 +113,7 @@ public class ChessClient {
 
     public String listGames(String... params) throws DataAccessException {
         assertSignedIn();
+        int count = 1;
         StringBuilder result = new StringBuilder("Games:\n");
         if(params.length == 1 && params[0].equals("games")) {
             ArrayList<GameInfo> games = (ArrayList<GameInfo>) server.listGames().games();
@@ -125,8 +126,9 @@ public class ChessClient {
                 if(game.blackUsername() != null) {
                     blackUser = game.blackUsername();
                 }
-                result.append(game.gameID()).append(": Game Name: ").append(game.gameName()).append(" | white: ");
+                result.append(count).append(": Game Name: ").append(game.gameName()).append(" | white: ");
                 result.append(whiteUser).append(" | black: ").append(blackUser).append("\n");
+                count++;
             }
             return result.toString();
         } else {
@@ -147,7 +149,7 @@ public class ChessClient {
             String gameName = nameBuilder.toString();
             try {
                 CreateGameRes res = server.createGame(new CreateGameReq(gameName));
-                return String.format("Successfully made new game: %s with game number: %d\n", gameName, res.gameID());
+                return String.format("Successfully made new game: %s\n", gameName);
             } catch(DataAccessException ex) {
                 throw new DataAccessException(400, "Error: Game with that name already exists in database.\n");
             }
@@ -156,11 +158,17 @@ public class ChessClient {
         }
     }
 
+    private ArrayList<GameInfo> getListOfGames() throws DataAccessException {
+        ArrayList<GameInfo> games = new ArrayList<>();
+        games = (ArrayList<GameInfo>) server.listGames().games();
+        return games;
+    }
+
     public String playGame(String... params) throws DataAccessException {
         assertSignedIn();
         if(params.length == 3 && params[0].equals("game")) {
             ChessGame.TeamColor color;
-            int gameNum = 0;
+            int reqNum = 0;
             if(params[2].equals("white")) {
                 color = ChessGame.TeamColor.WHITE;
             } else if(params[2].equals("black")) {
@@ -169,12 +177,14 @@ public class ChessClient {
                 throw new DataAccessException(400, "Error: expected play game <game number> <white/black>\n");
             }
             try {
-                gameNum = Integer.parseInt(params[1]);
+                reqNum = Integer.parseInt(params[1]);
             } catch (Exception ex) {
                 throw new DataAccessException(400, "Error: expected play game <game number> <white/black>\n");
             }
             try {
-                server.joinGame(new JoinGameReq(color, gameNum));
+                ArrayList<GameInfo> games = getListOfGames();
+                int gameID = games.get(reqNum-1).gameID();
+                server.joinGame(new JoinGameReq(color, gameID));
                 String result = "Successfully joined game\n";
                 result = result + BoardPrinter.boardDefault();
                 state = State.INGAME;
@@ -190,10 +200,12 @@ public class ChessClient {
 
     public String observeGame(String... params) throws DataAccessException {
         assertSignedIn();
-        int gameNum = 0;
+        int reqNum = 0;
         if(params.length == 2 && params[0].equals("game")) {
             try {
-                gameNum = Integer.parseInt(params[1]);
+                reqNum = Integer.parseInt(params[1]);
+                ArrayList<GameInfo> games = getListOfGames();
+                games.get(reqNum-1); //make sure valid number was entered
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error: enter a valid game number\n");
             }

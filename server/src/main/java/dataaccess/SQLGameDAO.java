@@ -11,7 +11,7 @@ import java.util.Collection;
 
 public class SQLGameDAO implements GameDAO {
 
-    private int gameIDCount;
+    private int gameIDCount = 1000;
     private final Gson gson;
 
     private final String[] createStatements = {
@@ -38,10 +38,13 @@ public class SQLGameDAO implements GameDAO {
             var ps = conn.prepareStatement(statement);
                 try(var rs = ps.executeQuery()) {
                     if(rs.next()) {
-                        int maxGameID = rs.getInt("max_value");
-                        gameIDCount = maxGameID+1;
+                        gameIDCount = rs.getInt("max_value");
+                        gameIDCount++;
                     } else {
-                        gameIDCount = 1;
+                        gameIDCount = 1000;
+                    }
+                    if(gameIDCount == 1) {
+                        gameIDCount = 1000; //if 1 then table was empty; make IDs start at 1000
                     }
                 }
         } catch(Exception e) {
@@ -158,7 +161,7 @@ public class SQLGameDAO implements GameDAO {
             var statement = "TRUNCATE games";
             try(var ps = conn.prepareStatement(statement)) {
                 ps.executeUpdate();
-                gameIDCount = 1;
+                gameIDCount = 1000;
             }
         } catch(Exception e) {
             throw new DataAccessException(401, String.format("Unable to perform request: %s%n",e.getMessage()));
