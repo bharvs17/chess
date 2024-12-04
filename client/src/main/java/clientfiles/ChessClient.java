@@ -58,7 +58,11 @@ public class ChessClient {
                     """;
         } else {
             return """
-                    - implement this next phase
+                    - redraw chess board
+                    - leave
+                    - make move <row,col> <row,col> <promotion piece>
+                    - resign
+                    - highlight legal moves
                     """;
         }
     }
@@ -187,7 +191,7 @@ public class ChessClient {
                 server.joinGame(new JoinGameReq(color, gameID));
                 String result = "Successfully joined game\n";
                 result = result + BoardPrinter.boardDefault();
-                state = State.INGAME;
+                state = State.PLAYINGGAME;
                 return result;
                 //print out board (start with above message then append board to string and return that)
             } catch(Exception ex) {
@@ -209,9 +213,40 @@ public class ChessClient {
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error: enter a valid game number\n");
             }
+            state = State.OBSERVINGGAME;
             return BoardPrinter.boardDefault();
         } else {
             throw new DataAccessException(400, "Error: expected observe game <game number>\n");
+        }
+    }
+
+    public String redrawChessBoard(String... params) throws DataAccessException {
+        if(state != State.OBSERVINGGAME || state != State.PLAYINGGAME) {
+            throw new DataAccessException(400, "Error: you must be playing or observing a game");
+        }
+    }
+
+    public String leave(String... params) throws DataAccessException {
+        if(state != State.OBSERVINGGAME || state != State.PLAYINGGAME) {
+            throw new DataAccessException(400, "Error: you must be playing or observing a game");
+        }
+    }
+
+    public String makeMove(String... params) throws DataAccessException {
+        if(state != State.PLAYINGGAME) {
+            throw new DataAccessException(400, "Error: you must be playing the game to do that");
+        }
+    }
+
+    public String resign(String... params) throws DataAccessException {
+        if(state != State.PLAYINGGAME) {
+            throw new DataAccessException(400, "Error: you must be playing the game to do that");
+        }
+    }
+
+    public String highlightMoves(String... params) throws DataAccessException {
+        if(state != State.OBSERVINGGAME || state != State.PLAYINGGAME) {
+            throw new DataAccessException(400, "Error: you must be playing or observing a game");
         }
     }
 
