@@ -110,7 +110,7 @@ public class ChessClient {
     //format list games to look nice (say empty instead of null for open spots)
     //also make sure when listing games to put them in order and number in order should match id
     public String register(String... params) throws DataAccessException {
-        if(params.length == 3) {
+        if(ValidInputChecker.checkRegister(params)) {
             try {
                 server.register(new RegisterReq(params[0], params[1], params[2]));
                 state = State.SIGNEDIN;
@@ -124,7 +124,7 @@ public class ChessClient {
     }
 
     public String login(String... params) throws DataAccessException {
-        if(params.length == 2) {
+        if(ValidInputChecker.checkLogin(params)) {
             try {
                 server.login(new LoginReq(params[0],params[1]));
                 state = State.SIGNEDIN;
@@ -138,7 +138,7 @@ public class ChessClient {
     }
 
     public String logout(String... params) throws DataAccessException {
-        if(params.length == 0) {
+        if(ValidInputChecker.checkLogout(params)) {
             server.logout();
             state = State.SIGNEDOUT;
             return "Successfully logged out.\n";
@@ -148,7 +148,7 @@ public class ChessClient {
     }
 
     public String resetDB(String... params) throws DataAccessException {
-        if(params.length == 1 && params[0].equals("admin")) {
+        if(ValidInputChecker.checkReset(params)) {
             server.deleteAll();
             return "Successfully deleted all data.\n";
         } else {
@@ -159,7 +159,7 @@ public class ChessClient {
     public String listGames(String... params) throws DataAccessException {
         int count = 1;
         StringBuilder result = new StringBuilder("Games:\n");
-        if(params.length == 1 && params[0].equals("games")) {
+        if(ValidInputChecker.checkListGames(params)) {
             ArrayList<GameInfo> games = (ArrayList<GameInfo>) server.listGames().games();
             for(GameInfo game : games) {
                 String whiteUser = "empty";
@@ -181,7 +181,7 @@ public class ChessClient {
     }
 
     public String createGame(String... params) throws DataAccessException {
-        if(params.length >= 2 && params[0].equals("game")) {
+        if(ValidInputChecker.checkMakeGame(params)) {
             StringBuilder nameBuilder = new StringBuilder();
             for(int i = 1; i < params.length; i++) {
                 nameBuilder.append(params[i]);
@@ -305,8 +305,7 @@ public class ChessClient {
         if(endRow < 1 || endRow > 8 || endCol < 1 || endCol > 8) {
             throw new DataAccessException(400, "Error: enter a valid move- row and column number must be between 1-8");
         }
-        ChessMove
-        //now check if numbers are valid (need to be in bounds of chess board, 1-8)
+
         //if piece at start is a pawn AND moves to final row then get the promo piece (if none given then give error and tell player to type a piece type)
         //dont say it's an error- say since they are moving pawn to final row they need to provide a promotion piece type
 
@@ -321,5 +320,5 @@ public class ChessClient {
         //then use currentGame to get the list of valid moves
         //then use board printer and print board with the highlighted squares
     }
-//if class is too big (code quality check), then could make a valid input checker class that checks input given what function it is referring to
+
 }
