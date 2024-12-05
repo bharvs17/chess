@@ -231,7 +231,7 @@ public class ChessClient {
                 //now need to find a way to get the chess game json, deserialize, and update currentGame to that
                 String result = "Successfully joined game\n";
                 currentColor = color;
-                result = result + BoardPrinter.boardString(currentGame, currentColor);
+                result = result + BoardPrinter.boardString(currentGame, currentColor, false);
                 state = State.PLAYINGGAME;
                 return result;
             } catch(Exception ex) {
@@ -255,7 +255,7 @@ public class ChessClient {
             }
             state = State.OBSERVINGGAME;
             currentColor = ChessGame.TeamColor.WHITE;
-            return BoardPrinter.boardString(currentGame, currentColor);
+            return BoardPrinter.boardString(currentGame, currentColor, false);
         } else {
             throw new DataAccessException(400, "Error: expected observe game <game number>\n");
         }
@@ -263,7 +263,7 @@ public class ChessClient {
 
     public String redrawChessBoard(String... params) throws DataAccessException {
         if(ValidInputChecker.checkRedrawBoard(params)) {
-            return BoardPrinter.boardString(currentGame,currentColor);
+            return BoardPrinter.boardString(currentGame,currentColor, false);
         } else {
             throw new DataAccessException(400, "Error: did you mean 'redraw board'?");
         }
@@ -295,7 +295,9 @@ public class ChessClient {
 
     public String highlightMoves(String... params) throws DataAccessException {
         ArrayList<ChessMove> moves = (ArrayList<ChessMove>) ValidInputChecker.checkHighlightMoves(currentGame,params);
-        //now need to update board printer to print board using this list MAKE SURE to also highlight the given location
+        int row = Integer.parseInt(String.valueOf(params[2].charAt(0)));
+        int col = Integer.parseInt(String.valueOf(params[2].charAt(2)));
+        return BoardPrinter.highlightMoves(currentGame, currentColor, row, col, moves);
     }
 
 }
