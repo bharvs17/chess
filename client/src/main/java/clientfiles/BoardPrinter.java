@@ -177,8 +177,6 @@ public class BoardPrinter {
     }
 
     public static String highlightMoves(ChessGame game, ChessGame.TeamColor col, int r, int c, Collection<ChessMove> moves) {
-        ChessBoard board = game.getBoard();
-        StringBuilder higlightBoard = new StringBuilder();
         resetHighlight();
         for(ChessMove m : moves) {
             int tempRow = m.getEndPosition().getRow();
