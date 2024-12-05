@@ -2,6 +2,7 @@ package clientfiles;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.InvalidMoveException;
 import exception.DataAccessException;
 import model.*;
 
@@ -208,7 +209,7 @@ public class ChessClient {
     }
 
     public String playGame(String... params) throws DataAccessException {
-        if(params.length == 3 && params[0].equals("game")) {
+        if(ValidInputChecker.checkPlayGame(params)) {
             ChessGame.TeamColor color;
             int reqNum = 0;
             if(params[2].equals("white")) {
@@ -243,7 +244,7 @@ public class ChessClient {
 
     public String observeGame(String... params) throws DataAccessException {
         int reqNum = 0;
-        if(params.length == 2 && params[0].equals("game")) {
+        if(ValidInputChecker.checkObserveGame(params)) {
             try {
                 reqNum = Integer.parseInt(params[1]);
                 ArrayList<GameInfo> games = getListOfGames();
@@ -261,7 +262,7 @@ public class ChessClient {
     }
 
     public String redrawChessBoard(String... params) throws DataAccessException {
-        if(params[0].equals("board")) {
+        if(ValidInputChecker.checkRedrawBoard(params)) {
             return BoardPrinter.boardString(currentGame,currentColor);
         } else {
             throw new DataAccessException(400, "Error: did you mean 'redraw board'?");
@@ -278,36 +279,13 @@ public class ChessClient {
     }
 
     public String makeMove(String... params) throws DataAccessException {
-        if(params.length < 3 || params.length > 4) {
-            throw new DataAccessException(400, "Error: expected make move #,# #,#");
-        }
-        if(!params[0].equals("move")) {
-            throw new DataAccessException(400, "Error: expected make move #,# #,#");
-        }
-        if(params[1].length() != 3 && params[2].length() != 3) {
-            throw new DataAccessException(400, "Error: expected make move #,# #,# where # is a single digit number");
-        }
-        int startRow;
-        int startCol;
-        int endRow;
-        int endCol;
+        ChessMove move = ValidInputChecker.checkMakeMove(currentGame,params);
         try {
-            startRow = Integer.parseInt(String.valueOf(params[1].charAt(0)));
-            startCol = Integer.parseInt(String.valueOf(params[1].charAt(2)));
-            endRow = Integer.parseInt(String.valueOf(params[2].charAt(0)));
-            endCol = Integer.parseInt(String.valueOf(params[2].charAt(2)));
-        } catch(Exception ex) {
-            throw new DataAccessException(400, "Error: expected make move #,# #,# where # is a single digit number");
+            currentGame.makeMove(move);
+        } catch(InvalidMoveException ex) {
+            throw new DataAccessException(400, ex.getMessage());
         }
-        if(startRow < 1 || startRow > 8 || startCol < 1 || startCol > 8) {
-            throw new DataAccessException(400, "Error: enter a valid move- row and column number must be between 1-8");
-        }
-        if(endRow < 1 || endRow > 8 || endCol < 1 || endCol > 8) {
-            throw new DataAccessException(400, "Error: enter a valid move- row and column number must be between 1-8");
-        }
-
-        //if piece at start is a pawn AND moves to final row then get the promo piece (if none given then give error and tell player to type a piece type)
-        //dont say it's an error- say since they are moving pawn to final row they need to provide a promotion piece type
+        //now update game in db
 
     }
 
@@ -316,9 +294,8 @@ public class ChessClient {
     }
 
     public String highlightMoves(String... params) throws DataAccessException {
-        //make sure given position is valid and has a piece there
-        //then use currentGame to get the list of valid moves
-        //then use board printer and print board with the highlighted squares
+        ArrayList<ChessMove> moves = (ArrayList<ChessMove>) ValidInputChecker.checkHighlightMoves(currentGame,params);
+        //now need to update board printer to print board using this list MAKE SURE to also highlight the given location
     }
 
 }

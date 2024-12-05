@@ -103,13 +103,13 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if(board.getPiece(move.getStartPosition()) == null) {
-            throw new InvalidMoveException("Invalid move- no piece at given start position");
+            throw new InvalidMoveException("Invalid move error- no piece at given start position");
         }
         if(currentTeam != board.getPiece(move.getStartPosition()).getTeamColor()) {
-            throw new InvalidMoveException("Invalid Move- not this team's turn");
+            throw new InvalidMoveException("Invalid Move error- not this team's turn");
         }
         if(!validMoves(move.getStartPosition()).contains(move)) {
-            throw new InvalidMoveException("Invalid move- Either move not possible for selected piece or the move results in check.");
+            throw new InvalidMoveException("Invalid move error- Either move not possible for selected piece or the move results in check.");
         }
         if(move.getPromotionPiece() != null) {
             board.addPiece(move.getEndPosition(),new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),move.getPromotionPiece()));
