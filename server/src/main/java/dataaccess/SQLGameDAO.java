@@ -173,7 +173,21 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public ChessGame getGame(int gameID) throws DataAccessException {
-
+        try(var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT chessgameJSON FROM games WHERE gameID = ?";
+            try(var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1,gameID);
+                try(var rs = ps.executeQuery()) {
+                    if(rs.next()) {
+                        return gson.fromJson(rs.getString("chessgameJSON"), ChessGame.class);
+                    } else {
+                        throw new DataAccessException(400, "Error: no game found in database");
+                    }
+                }
+            }
+        } catch(Exception e) {
+            throw new DataAccessException(401, String.format("Unable to perform request: %s%n",e.getMessage()));
+        }
     }
 
 }

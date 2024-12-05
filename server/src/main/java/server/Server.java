@@ -45,7 +45,7 @@ public class Server {
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
-        Spark.get("/game/id", this::getGameData);
+        Spark.get("/game/:id", this::getGameData);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
@@ -137,7 +137,7 @@ public class Server {
         try {
             gameID = Integer.parseInt(req.params(":id"));
         } catch (Exception ex) {
-            throw new DataAccessException(400, "Error: something went wrong");
+            throw new DataAccessException(400, "Error: something went wrong with the game id");
         }
         ChessGame reqGame = gameService.getGame(gameID);
         res.status(200);

@@ -254,8 +254,8 @@ public class ChessClient {
             try {
                 reqNum = Integer.parseInt(params[1]);
                 ArrayList<GameInfo> games = getListOfGames();
-                games.get(reqNum-1); //makes sure a valid number was entered
-                //MAKE SURE to get requested game from db and update currentGame
+                int gameID = games.get(reqNum-1).gameID();
+                currentGame = server.getGame(gameID);
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error: enter a valid game number\n");
             }
