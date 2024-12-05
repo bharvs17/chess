@@ -98,7 +98,6 @@ public class Server {
 
     private Object createGame(Request req, Response res) throws DataAccessException {
         String authToken = req.headers("authorization");
-        //System.out.printf("auth token here is %s%n", authToken);
         authService.checkAuth(authToken);
         CreateGameReq gameReq = gson.fromJson(req.body(), CreateGameReq.class);
         res.status(200);

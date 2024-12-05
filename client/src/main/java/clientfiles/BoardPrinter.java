@@ -8,11 +8,26 @@ import static ui.EscapeSequences.*;
 
 public class BoardPrinter {
 
-    private static final int WIDTH = 8;
-    private static final int HEIGHT = 3;
-
-    public static String getBoard(ChessGame game) {
-        return "";
+    public static String boardString(ChessGame game, ChessGame.TeamColor color) {
+        ChessBoard board = game.getBoard();
+        StringBuilder boardStr = new StringBuilder();
+        boardStr.append(SET_TEXT_BOLD);
+        if(color == ChessGame.TeamColor.WHITE) {
+            boardStr.append(topBottomLine(0));
+            for(int i = 8; i > 0; i--) {
+                boardStr.append(rowString(board,i,0));
+            }
+            boardStr.append(topBottomLine(0));
+        } else {
+            boardStr.append(topBottomLine(1));
+            for(int i = 1; i < 9; i++) {
+                boardStr.append(rowString(board,i,1));
+            }
+            boardStr.append(topBottomLine(1));
+        }
+        boardStr.append(RESET_BG_COLOR);
+        boardStr.append(RESET_TEXT_COLOR);
+        return boardStr.toString();
     }
 
     public static String boardDefault() {
@@ -37,7 +52,7 @@ public class BoardPrinter {
         return board.toString();
     }
 
-    public static String topBottomLine(int color) {
+    private static String topBottomLine(int color) {
         String[] cols;
         if (color == 0) {
             cols = new String[]{"A", "B", "C", "D", "E", "F", "G", "H"};
@@ -58,7 +73,7 @@ public class BoardPrinter {
         return topLine.toString();
     }
 
-    public static String rowString(ChessBoard board, int row, int co) {
+    private static String rowString(ChessBoard board, int row, int co) {
         StringBuilder rowString = new StringBuilder();
         String initialColor;
         if((co == 0 && (row % 2 == 0)) || (co == 1 && (row % 2 == 1))) {
@@ -100,7 +115,7 @@ public class BoardPrinter {
         return rowString.toString();
     }
 
-    public static String pieceString(ChessBoard board, int r, int c, int co) {
+    private static String pieceString(ChessBoard board, int r, int c, int co) {
         StringBuilder pieceBuilder = new StringBuilder();
         ChessPiece piece;
         if(co == 0) {

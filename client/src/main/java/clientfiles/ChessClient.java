@@ -1,6 +1,7 @@
 package clientfiles;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import exception.DataAccessException;
 import model.*;
 
@@ -12,6 +13,8 @@ public class ChessClient {
     private final String url;
     private final ServerFacade server;
     private State state;
+    private ChessGame currentGame;
+    private ChessGame.TeamColor currentColor;
 
     public ChessClient(String serverUrl) {
         url = serverUrl;
@@ -24,28 +27,57 @@ public class ChessClient {
             String[] tokens = input.toLowerCase().split(" ");
             String command = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch(command) {
-                case "register" -> register(params);
-                case "login" -> login(params);
-                case "logout" -> logout(params);
-                case "reset" -> resetDB(params);
-                case "list" -> listGames(params);
-                case "create" -> createGame(params);
-                case "play" -> playGame(params);
-                case "observe" -> observeGame(params);
-                case "quit" -> "quit";
-                default -> help(); //connect to unknown command method and say it's an unknown command, then print out the help commands
-            };
+            if(state == State.SIGNEDOUT) {
+                return switch(command) {
+                    case "register" -> register(params);
+                    case "login" -> login(params);
+                    case "reset" -> resetDB(params);
+                    case "quit" -> "quit";
+                    case "help" -> help();
+                    default -> "Unknown or invalid command. Here is a list of valid commands:\n" + help();
+                };
+            } else if(state == State.SIGNEDIN) {
+                return switch(command) {
+                    case "logout" -> logout(params);
+                    case "list" -> listGames(params);
+                    case "create" -> createGame(params);
+                    case "play" -> playGame(params);
+                    case "observe" -> observeGame(params);
+                    case "help" -> help();
+                    default -> "Unknown or invalid command. Here is a list of valid commands:\n" + help();
+                };
+            } else if(state == State.PLAYINGGAME) {
+                return switch(command) {
+                    case "redraw" -> redrawChessBoard(params);
+                    case "leave" -> leave(params);
+                    case "make" -> makeMove(params);
+                    case "resign" -> resign(params);
+                    case "highlight" -> highlightMoves(params);
+                    case "help" -> help();
+                    default -> "Unknown or invalid command. Here is a list of valid commands:\n" + help();
+                };
+            } else {
+                return switch(command) {
+                    case "redraw" -> redrawChessBoard(params);
+                    case "leave" -> leave(params);
+                    case "highlight" -> highlightMoves(params);
+                    case "help" -> help();
+                    default -> "Unknown or invalid command. Here is a list of valid commands:\n" + help();
+                };
+            }
         } catch (DataAccessException ex) {
             return ex.getMessage();
         }
     }
+
+
 
     public String help() {
         if(state == State.SIGNEDOUT) {
             return """
                     - register <username> <password> <email>
                     - login <username> <password>
+                    - help
                     - quit
                     """;
         } else if(state == State.SIGNEDIN) {
@@ -55,14 +87,23 @@ public class ChessClient {
                     - create game <game name>
                     - play game <game number> <white/black>
                     - observe game <game number>
+                    - help
+                    """;
+        } else if(state == State.PLAYINGGAME) {
+            return """
+                    - redraw board
+                    - leave
+                    - make move <row,col> <row,col>
+                    - resign
+                    - highlight legal moves <row,col>
+                    - help
                     """;
         } else {
             return """
-                    - redraw chess board
+                    - redraw board
                     - leave
-                    - make move <row,col> <row,col> <promotion piece>
-                    - resign
-                    - highlight legal moves
+                    - highlight legal moves <row,col>
+                    - help
                     """;
         }
     }
@@ -107,7 +148,7 @@ public class ChessClient {
     }
 
     public String resetDB(String... params) throws DataAccessException {
-        if(state == State.SIGNEDOUT && params.length == 1 && params[0].equals("admin")) {
+        if(params.length == 1 && params[0].equals("admin")) {
             server.deleteAll();
             return "Successfully deleted all data.\n";
         } else {
@@ -116,7 +157,6 @@ public class ChessClient {
     }
 
     public String listGames(String... params) throws DataAccessException {
-        assertSignedIn();
         int count = 1;
         StringBuilder result = new StringBuilder("Games:\n");
         if(params.length == 1 && params[0].equals("games")) {
@@ -141,7 +181,6 @@ public class ChessClient {
     }
 
     public String createGame(String... params) throws DataAccessException {
-        assertSignedIn();
         if(params.length >= 2 && params[0].equals("game")) {
             StringBuilder nameBuilder = new StringBuilder();
             for(int i = 1; i < params.length; i++) {
@@ -169,7 +208,6 @@ public class ChessClient {
     }
 
     public String playGame(String... params) throws DataAccessException {
-        assertSignedIn();
         if(params.length == 3 && params[0].equals("game")) {
             ChessGame.TeamColor color;
             int reqNum = 0;
@@ -189,11 +227,12 @@ public class ChessClient {
                 ArrayList<GameInfo> games = getListOfGames();
                 int gameID = games.get(reqNum-1).gameID();
                 server.joinGame(new JoinGameReq(color, gameID));
+                //now need to find a way to get the chess game json, deserialize, and update currentGame to that
                 String result = "Successfully joined game\n";
-                result = result + BoardPrinter.boardDefault();
+                currentColor = color;
+                result = result + BoardPrinter.boardString(currentGame, currentColor);
                 state = State.PLAYINGGAME;
                 return result;
-                //print out board (start with above message then append board to string and return that)
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error joining game: game may not exist or your color was taken by another player\n");
             }
@@ -203,57 +242,84 @@ public class ChessClient {
     }
 
     public String observeGame(String... params) throws DataAccessException {
-        assertSignedIn();
         int reqNum = 0;
         if(params.length == 2 && params[0].equals("game")) {
             try {
                 reqNum = Integer.parseInt(params[1]);
                 ArrayList<GameInfo> games = getListOfGames();
-                games.get(reqNum-1); //make sure valid number was entered
+                games.get(reqNum-1); //makes sure a valid number was entered
+                //MAKE SURE to get requested game from db and update currentGame
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error: enter a valid game number\n");
             }
             state = State.OBSERVINGGAME;
-            return BoardPrinter.boardDefault();
+            currentColor = ChessGame.TeamColor.WHITE;
+            return BoardPrinter.boardString(currentGame, currentColor);
         } else {
             throw new DataAccessException(400, "Error: expected observe game <game number>\n");
         }
     }
 
     public String redrawChessBoard(String... params) throws DataAccessException {
-        if(state != State.OBSERVINGGAME || state != State.PLAYINGGAME) {
-            throw new DataAccessException(400, "Error: you must be playing or observing a game");
+        if(params[0].equals("board")) {
+            return BoardPrinter.boardString(currentGame,currentColor);
+        } else {
+            throw new DataAccessException(400, "Error: did you mean 'redraw board'?");
         }
     }
 
     public String leave(String... params) throws DataAccessException {
-        if(state != State.OBSERVINGGAME || state != State.PLAYINGGAME) {
-            throw new DataAccessException(400, "Error: you must be playing or observing a game");
+        if(state == State.OBSERVINGGAME) {
+            state = State.SIGNEDIN;
+        } else {
+            state = State.SIGNEDIN;
+            //using currentColor (and maybe id? idk) update the game in the db so the player at the currentColor is null
         }
     }
 
     public String makeMove(String... params) throws DataAccessException {
-        if(state != State.PLAYINGGAME) {
-            throw new DataAccessException(400, "Error: you must be playing the game to do that");
+        if(params.length < 3 || params.length > 4) {
+            throw new DataAccessException(400, "Error: expected make move #,# #,#");
         }
+        if(!params[0].equals("move")) {
+            throw new DataAccessException(400, "Error: expected make move #,# #,#");
+        }
+        if(params[1].length() != 3 && params[2].length() != 3) {
+            throw new DataAccessException(400, "Error: expected make move #,# #,# where # is a single digit number");
+        }
+        int startRow;
+        int startCol;
+        int endRow;
+        int endCol;
+        try {
+            startRow = Integer.parseInt(String.valueOf(params[1].charAt(0)));
+            startCol = Integer.parseInt(String.valueOf(params[1].charAt(2)));
+            endRow = Integer.parseInt(String.valueOf(params[2].charAt(0)));
+            endCol = Integer.parseInt(String.valueOf(params[2].charAt(2)));
+        } catch(Exception ex) {
+            throw new DataAccessException(400, "Error: expected make move #,# #,# where # is a single digit number");
+        }
+        if(startRow < 1 || startRow > 8 || startCol < 1 || startCol > 8) {
+            throw new DataAccessException(400, "Error: enter a valid move- row and column number must be between 1-8");
+        }
+        if(endRow < 1 || endRow > 8 || endCol < 1 || endCol > 8) {
+            throw new DataAccessException(400, "Error: enter a valid move- row and column number must be between 1-8");
+        }
+        ChessMove
+        //now check if numbers are valid (need to be in bounds of chess board, 1-8)
+        //if piece at start is a pawn AND moves to final row then get the promo piece (if none given then give error and tell player to type a piece type)
+        //dont say it's an error- say since they are moving pawn to final row they need to provide a promotion piece type
+
     }
 
     public String resign(String... params) throws DataAccessException {
-        if(state != State.PLAYINGGAME) {
-            throw new DataAccessException(400, "Error: you must be playing the game to do that");
-        }
+
     }
 
     public String highlightMoves(String... params) throws DataAccessException {
-        if(state != State.OBSERVINGGAME || state != State.PLAYINGGAME) {
-            throw new DataAccessException(400, "Error: you must be playing or observing a game");
-        }
+        //make sure given position is valid and has a piece there
+        //then use currentGame to get the list of valid moves
+        //then use board printer and print board with the highlighted squares
     }
-
-    private void assertSignedIn() throws DataAccessException {
-        if(state != State.SIGNEDIN) {
-            throw new DataAccessException(400, "You must be logged in and not in a game to do that.\n");
-        }
-    }
-
+//if class is too big (code quality check), then could make a valid input checker class that checks input given what function it is referring to
 }

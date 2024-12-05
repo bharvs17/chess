@@ -109,7 +109,7 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid Move- not this team's turn");
         }
         if(!validMoves(move.getStartPosition()).contains(move)) {
-            throw new InvalidMoveException("Invalid move- Either move not possible for selected piece or move results in check.");
+            throw new InvalidMoveException("Invalid move- Either move not possible for selected piece or the move results in check.");
         }
         if(move.getPromotionPiece() != null) {
             board.addPiece(move.getEndPosition(),new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),move.getPromotionPiece()));
