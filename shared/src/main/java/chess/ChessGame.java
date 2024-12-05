@@ -13,11 +13,13 @@ public class ChessGame {
 
     TeamColor currentTeam;
     ChessBoard board;
+    boolean isOver;
 
     public ChessGame() {
         currentTeam = TeamColor.WHITE;
         board = new ChessBoard();
         board.resetBoard();
+        isOver = false;
     }
 
     /**
@@ -204,6 +206,7 @@ public class ChessGame {
                 }
             }
         }
+        isOver = true;
         return true;
     }
 
@@ -223,5 +226,9 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public void resign() {
+        isOver = true;
     }
 }

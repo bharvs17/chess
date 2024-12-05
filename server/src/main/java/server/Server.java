@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
@@ -44,6 +45,7 @@ public class Server {
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
+        Spark.get("/game/id", this::getGameData);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
@@ -126,6 +128,20 @@ public class Server {
             authService.deleteAllAuths();
             gameService.deleteAllGames();
         }
+    }
+
+    private Object getGameData(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization");
+        authService.checkAuth(authToken);
+        int gameID;
+        try {
+            gameID = Integer.parseInt(req.params(":id"));
+        } catch (Exception ex) {
+            throw new DataAccessException(400, "Error: something went wrong");
+        }
+        ChessGame reqGame = gameService.getGame(gameID);
+        res.status(200);
+        return gson.toJson(reqGame);
     }
 
 }

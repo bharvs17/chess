@@ -1,5 +1,6 @@
 package clientfiles;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
 import exception.DataAccessException;
@@ -53,6 +54,11 @@ public class ServerFacade {
     public void deleteAll() throws DataAccessException {
         String path = "/db";
         this.makeRequest("DELETE", path, authToken, null, null);
+    }
+
+    public ChessGame getGame(int gameID) throws DataAccessException {
+        String path = "/game/" + gameID;
+        return this.makeRequest("GET",path,authToken,null, ChessGame.class);
     }
 
     private <T> T makeRequest(String method, String path, String token, Object request, Class<T> responseClass) throws DataAccessException {

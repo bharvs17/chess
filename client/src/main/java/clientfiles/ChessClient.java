@@ -16,6 +16,8 @@ public class ChessClient {
     private State state;
     private ChessGame currentGame;
     private ChessGame.TeamColor currentColor;
+    int currID;
+    String currUsername;
 
     public ChessClient(String serverUrl) {
         url = serverUrl;
@@ -115,6 +117,7 @@ public class ChessClient {
             try {
                 server.register(new RegisterReq(params[0], params[1], params[2]));
                 state = State.SIGNEDIN;
+                currUsername = params[0];
                 return String.format("Registered new user: %s\n", params[0]);
             } catch(DataAccessException ex) {
                 throw new DataAccessException(400, "Error: username already taken\n");
@@ -129,6 +132,7 @@ public class ChessClient {
             try {
                 server.login(new LoginReq(params[0],params[1]));
                 state = State.SIGNEDIN;
+                currUsername = params[0];
                 return String.format("Successfully logged in user: %s\n", params[0]);
             } catch(DataAccessException ex) {
                 throw new DataAccessException(400, "Error: no such user in database or wrong password.\n");
@@ -142,6 +146,7 @@ public class ChessClient {
         if(ValidInputChecker.checkLogout(params)) {
             server.logout();
             state = State.SIGNEDOUT;
+            currUsername = null; //be aware of currID and other curr global vars
             return "Successfully logged out.\n";
         } else {
             throw new DataAccessException(400, "Error: expected logout\n");
@@ -227,8 +232,9 @@ public class ChessClient {
             try {
                 ArrayList<GameInfo> games = getListOfGames();
                 int gameID = games.get(reqNum-1).gameID();
+                currID = gameID;
                 server.joinGame(new JoinGameReq(color, gameID));
-                //now need to find a way to get the chess game json, deserialize, and update currentGame to that
+                currentGame = server.getGame(gameID);
                 String result = "Successfully joined game\n";
                 currentColor = color;
                 result = result + BoardPrinter.boardString(currentGame, currentColor, false);
@@ -275,17 +281,18 @@ public class ChessClient {
         } else {
             state = State.SIGNEDIN;
             //using currentColor (and maybe id? idk) update the game in the db so the player at the currentColor is null
+            server.leaveGame();
         }
     }
 
     public String makeMove(String... params) throws DataAccessException {
         ChessMove move = ValidInputChecker.checkMakeMove(currentGame,params);
         try {
-            currentGame.makeMove(move);
+            currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
+            return "Successfully made move\n";
         } catch(InvalidMoveException ex) {
             throw new DataAccessException(400, ex.getMessage());
         }
-        //now update game in db
 
     }
 

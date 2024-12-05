@@ -137,6 +137,10 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
+    public void updateGame(int gameID, ChessGame updatedGame) {
+
+    }
+
     private void addUser(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         try(var conn = DatabaseManager.getConnection()) {
             String statement;
@@ -166,6 +170,10 @@ public class SQLGameDAO implements GameDAO {
         } catch(Exception e) {
             throw new DataAccessException(401, String.format("Unable to perform request: %s%n",e.getMessage()));
         }
+    }
+
+    public ChessGame getGame(int gameID) throws DataAccessException {
+
     }
 
 }

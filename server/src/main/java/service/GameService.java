@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import exception.DataAccessException;
 import dataaccess.GameDAO;
 import model.CreateGameReq;
@@ -37,6 +38,10 @@ public class GameService {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public ChessGame getGame(int gameID) throws DataAccessException {
+        return gameAccess.getGame(gameID);
     }
 
 }
