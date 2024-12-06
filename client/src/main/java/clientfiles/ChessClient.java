@@ -304,7 +304,7 @@ public class ChessClient {
             throw new DataAccessException(400, "Error: the game is over. No moves can be made\n");
         }
         if(currentGame.getTeamTurn() != currentColor) {
-            throw new DataAccessException(400, "Error: it is not your turn\n");
+            throw new DataAccessException(400, "Error: it is not your turn OR you cannot move the other team's piece\n");
         }
         try {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
@@ -336,8 +336,8 @@ public class ChessClient {
 
     public String highlightMoves(String... params) throws DataAccessException {
         ArrayList<ChessMove> moves = (ArrayList<ChessMove>) ValidInputChecker.checkHighlightMoves(currentGame,params);
-        int row = Integer.parseInt(String.valueOf(params[2].charAt(0)));
-        int col = Integer.parseInt(String.valueOf(params[2].charAt(2)));
+        int row = Integer.parseInt(String.valueOf(params[2].charAt(1)));
+        int col = ValidInputChecker.colConverter(String.valueOf(params[2].charAt(0)));
         return BoardPrinter.highlightMoves(currentGame, currentColor, row, col, moves);
     }
 
