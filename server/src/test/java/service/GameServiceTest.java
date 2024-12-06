@@ -100,5 +100,31 @@ class GameServiceTest {
     }
 
     @Test
-    void
+    void updateGameBad() throws DataAccessException {
+        service.deleteAllGames();
+        service.makeGame(new CreateGameReq("game"));
+        Assertions.assertThrows(DataAccessException.class, () -> service.updateGame(0,new ChessGame()));
+    }
+
+    @Test
+    void updateGameGood() throws DataAccessException {
+        service.deleteAllGames();
+        service.makeGame(new CreateGameReq("game"));
+        Assertions.assertDoesNotThrow(() -> service.updateGame(1,new ChessGame()));
+    }
+
+    @Test
+    void resignGameBad() throws DataAccessException {
+        service.deleteAllGames();
+        service.makeGame(new CreateGameReq("game"));
+        Assertions.assertThrows(DataAccessException.class, () -> service.resign(0));
+    }
+
+    @Test
+    void resignGameGood() throws DataAccessException {
+        service.deleteAllGames();
+        service.makeGame(new CreateGameReq("game"));
+        Assertions.assertDoesNotThrow(() -> service.resign(1));
+    }
+
 }

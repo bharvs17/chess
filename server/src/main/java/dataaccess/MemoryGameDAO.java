@@ -108,6 +108,10 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        GameData data = games.get(gameID);
+        if(data == null) {
+            throw new DataAccessException(400, "Error: the given game id was not found");
+        }
         String white = games.get(gameID).whiteUsername();
         String gName = games.get(gameID).gameName();
         String black = games.get(gameID).blackUsername();
@@ -116,6 +120,10 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public void resign(int gameID) throws DataAccessException {
+        GameData data = games.get(gameID);
+        if(data == null) {
+            throw new DataAccessException(400, "Error: the given game id was not found");
+        }
         ChessGame game = games.get(gameID).game();
         game.resign();
         updateGame(gameID, game);
