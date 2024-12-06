@@ -299,6 +299,9 @@ public class ChessClient {
 
     public String makeMove(String... params) throws DataAccessException {
         ChessMove move = ValidInputChecker.checkMakeMove(currentGame,params);
+        if(currentGame.getTeamTurn() != currentColor) {
+            throw new DataAccessException(400, "Error: it is not your turn");
+        }
         try {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
             return "Successfully made move\n";
