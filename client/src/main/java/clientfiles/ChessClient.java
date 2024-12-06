@@ -313,7 +313,12 @@ public class ChessClient {
     }
 
     public String resign(String... params) throws DataAccessException {
-
+        try {
+            server.resign(currID);
+            return "Successfully resigned.";
+        } catch (Exception ex) {
+            throw new DataAccessException(400, "Error: could not resign for some reason: " + ex.getMessage());
+        }
     }
 
     public String highlightMoves(String... params) throws DataAccessException {

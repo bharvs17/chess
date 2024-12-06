@@ -23,4 +23,6 @@ public interface GameDAO {
 
     void updateGame(int gameID, ChessGame game) throws DataAccessException;
 
+    void resign(int gameID) throws DataAccessException;
+
 }

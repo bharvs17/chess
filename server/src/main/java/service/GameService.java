@@ -52,4 +52,8 @@ public class GameService {
         gameAccess.updateGame(gameID, game);
     }
 
+    public void resign(int gameID) throws DataAccessException {
+        gameAccess.resign(gameID);
+    }
+
 }

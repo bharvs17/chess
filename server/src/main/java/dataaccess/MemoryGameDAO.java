@@ -104,4 +104,11 @@ public class MemoryGameDAO implements GameDAO {
         games.put(gameID, new GameData(gameID,white,black,gName,game));
     }
 
+    @Override
+    public void resign(int gameID) throws DataAccessException {
+        ChessGame game = games.get(gameID).game();
+        game.resign();
+        updateGame(gameID, game);
+    }
+
 }
