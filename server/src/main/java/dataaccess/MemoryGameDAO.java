@@ -80,7 +80,11 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public ChessGame getGame(int gameID) throws DataAccessException {
-        return games.get(gameID).game();
+        GameData data = games.get(gameID);
+        if(data == null) {
+            throw new DataAccessException(400, "Error: no such game id in database");
+        }
+        return data.game();
     }
 
     @Override
@@ -90,8 +94,14 @@ public class MemoryGameDAO implements GameDAO {
         String name = games.get(gameID).gameName();
         ChessGame game = games.get(gameID).game();
         if(color.equals("white")) {
+            if(w == null) {
+                throw new DataAccessException(400, "Error: no player to remove at white");
+            }
             games.put(gameID, new GameData(gameID,null,b,name,game));
         } else {
+            if(b == null) {
+                throw new DataAccessException(400, "Error: no player to remove at black");
+            }
             games.put(gameID, new GameData(gameID,w,null,name,game));
         }
     }

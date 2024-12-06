@@ -70,4 +70,35 @@ class GameServiceTest {
         ListGameRes expected = new ListGameRes(emptyGames);
         Assertions.assertEquals(service.listGames(), expected);
     }
+
+    @Test
+    void getGameBad() throws DataAccessException {
+        service.makeGame(new CreateGameReq("game1"));
+        Assertions.assertThrows(DataAccessException.class, () -> service.getGame(0));
+    }
+
+    @Test
+    void getGameGood() throws DataAccessException {
+        service.deleteAllGames();
+        service.makeGame(new CreateGameReq("game"));
+        Assertions.assertDoesNotThrow(() -> service.getGame(1));
+    }
+
+    @Test
+    void removeUserBad() throws DataAccessException {
+        service.deleteAllGames();
+        service.makeGame(new CreateGameReq("game"));
+        Assertions.assertThrows(DataAccessException.class, () -> service.removeUser(1,"white"));
+    }
+
+    @Test
+    void removeUserGood() throws DataAccessException {
+        service.deleteAllGames();
+        service.makeGame(new CreateGameReq("game"));
+        service.joinGame(new JoinGameReq(ChessGame.TeamColor.WHITE, 1), "user");
+        Assertions.assertDoesNotThrow(() -> service.removeUser(1, "white"));
+    }
+
+    @Test
+    void
 }
