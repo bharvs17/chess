@@ -72,7 +72,7 @@ public class ServerFacade {
     }
 
     public void resign(int gameID) throws DataAccessException {
-        String path = "game/resign/" + gameID;
+        String path = "/game/resign/" + gameID;
         this.makeRequest("PUT",path,authToken,null,null);
     }
 

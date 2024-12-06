@@ -46,9 +46,9 @@ public class Server {
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
         Spark.get("/game/:id", this::getGameData);
+        Spark.put("/game/resign/:id", this::resign); //if this is after below line then will map incorrectly (will think resign is :id and cause issues)
         Spark.put("/game/:id/:color", this::userLeave);
         Spark.put("/game/:id", this::updateGame);
-        Spark.put("/game/resign/:id", this::resign);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 

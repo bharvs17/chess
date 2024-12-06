@@ -8,6 +8,7 @@ import model.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class ChessClient {
 
@@ -271,7 +272,7 @@ public class ChessClient {
         if(ValidInputChecker.checkRedrawBoard(params)) {
             return BoardPrinter.boardString(currentGame,currentColor, false);
         } else {
-            throw new DataAccessException(400, "Error: did you mean 'redraw board'?");
+            throw new DataAccessException(400, "Error: did you mean 'redraw board'?\n");
         }
     }
 
@@ -281,7 +282,7 @@ public class ChessClient {
             currentGame = null;
             currentColor = null;
             currID = -1;
-            return "Successfully left game";
+            return "Successfully left game\n";
         } else {
             state = State.SIGNEDIN;
             //using currentColor (and maybe id? idk) update the game in the db so the player at the currentColor is null
@@ -293,14 +294,17 @@ public class ChessClient {
             currentColor = null;
             currentGame = null;
             currID = -1;
-            return "Successfully left game";
+            return "Successfully left game\n";
         }
     }
 
     public String makeMove(String... params) throws DataAccessException {
         ChessMove move = ValidInputChecker.checkMakeMove(currentGame,params);
+        if(currentGame.isGameOver()) {
+            throw new DataAccessException(400, "Error: the game is over. No moves can be made\n");
+        }
         if(currentGame.getTeamTurn() != currentColor) {
-            throw new DataAccessException(400, "Error: it is not your turn");
+            throw new DataAccessException(400, "Error: it is not your turn\n");
         }
         try {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
@@ -313,11 +317,20 @@ public class ChessClient {
     }
 
     public String resign(String... params) throws DataAccessException {
-        try {
-            server.resign(currID);
-            return "Successfully resigned.";
-        } catch (Exception ex) {
-            throw new DataAccessException(400, "Error: could not resign for some reason: " + ex.getMessage());
+        System.out.println("Are you sure you want to forfeit the match? Enter 'confirm' to do so, enter anything else to cancel");
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(">>> ");
+        String line = scanner.nextLine();
+        if(line.equalsIgnoreCase("confirm")) {
+            try {
+                currentGame.resign();
+                server.resign(currID);
+                return "Successfully resigned.\n";
+            } catch (Exception ex) {
+                throw new DataAccessException(400, "Error: could not resign for some reason: " + ex.getMessage() + "\n");
+            }
+        } else {
+            return "Did not resign\n";
         }
     }
 

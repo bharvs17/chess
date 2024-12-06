@@ -234,4 +234,8 @@ public class ChessGame {
     public void resign() {
         isOver = true;
     }
+
+    public boolean isGameOver() {
+        return isOver;
+    }
 }
