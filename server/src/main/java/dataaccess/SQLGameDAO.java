@@ -137,10 +137,6 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
-    public void updateGame(int gameID, ChessGame updatedGame) {
-
-    }
-
     private void addUser(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         try(var conn = DatabaseManager.getConnection()) {
             String statement;
@@ -202,6 +198,22 @@ public class SQLGameDAO implements GameDAO {
             }
         } catch (Exception ex) {
             throw new DataAccessException(400, "Error: something went wrong trying to leave game");
+        }
+    }
+
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        try(var conn = DatabaseManager.getConnection()) {
+            var statement = "UPDATE games SET chessgameJSON = ? WHERE gameID = ?";
+            try(var ps = conn.prepareStatement(statement)) {
+                ps.setString(1,gson.toJson(game));
+                ps.setInt(2,gameID);
+                int changed = ps.executeUpdate();
+                if(changed != 1) {
+                    throw new DataAccessException(400, "Error: db didn't change or changed too much");
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException(400, "Error: something went wrong trying to update chess board in database");
         }
     }
 

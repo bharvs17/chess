@@ -48,4 +48,8 @@ public class GameService {
         gameAccess.removeUser(gameID, color);
     }
 
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        gameAccess.updateGame(gameID, game);
+    }
+
 }

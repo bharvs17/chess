@@ -304,8 +304,9 @@ public class ChessClient {
         }
         try {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
+            server.updateGame(currID, currentGame);
             return "Successfully made move\n";
-        } catch(InvalidMoveException ex) {
+        } catch(Exception ex) {
             throw new DataAccessException(400, ex.getMessage());
         }
 

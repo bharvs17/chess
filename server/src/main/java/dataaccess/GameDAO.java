@@ -21,4 +21,6 @@ public interface GameDAO {
 
     void removeUser(int gameID, String color) throws DataAccessException;
 
+    void updateGame(int gameID, ChessGame game) throws DataAccessException;
+
 }
