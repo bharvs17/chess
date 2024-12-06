@@ -46,6 +46,7 @@ public class Server {
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
         Spark.get("/game/:id", this::getGameData);
+        Spark.put("/game/:id/:color", this::userLeave);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
@@ -142,6 +143,21 @@ public class Server {
         ChessGame reqGame = gameService.getGame(gameID);
         res.status(200);
         return gson.toJson(reqGame);
+    }
+
+    private Object userLeave(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization");
+        int gameID;
+        authService.checkAuth(authToken);
+        try {
+            gameID = Integer.parseInt(req.params(":id"));
+        } catch (Exception ex) {
+            throw new DataAccessException(400, "Error: something went wrong with the game id");
+        }
+        String color = req.params(":color");
+        gameService.removeUser(gameID,color);
+        res.status(200);
+        return "";
     }
 
 }

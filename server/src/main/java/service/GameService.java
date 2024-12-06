@@ -44,4 +44,8 @@ public class GameService {
         return gameAccess.getGame(gameID);
     }
 
+    public void removeUser(int gameID, String color) throws DataAccessException {
+        gameAccess.removeUser(gameID, color);
+    }
+
 }

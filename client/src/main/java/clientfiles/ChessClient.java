@@ -277,11 +277,23 @@ public class ChessClient {
 
     public String leave(String... params) throws DataAccessException {
         if(state == State.OBSERVINGGAME) {
-            state = State.SIGNEDIN;
+            state = State.SIGNEDIN; //ALSO shouldn't receive notification updates when just signed in
+            currentGame = null;
+            currentColor = null;
+            currID = -1;
+            return "Successfully left game";
         } else {
             state = State.SIGNEDIN;
             //using currentColor (and maybe id? idk) update the game in the db so the player at the currentColor is null
-            server.leaveGame();
+            if(currentColor == ChessGame.TeamColor.WHITE) {
+                server.leaveGame(currID, "white");
+            } else {
+                server.leaveGame(currID, "black");
+            }
+            currentColor = null;
+            currentGame = null;
+            currID = -1;
+            return "Successfully left game";
         }
     }
 

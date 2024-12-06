@@ -190,4 +190,19 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
+    public void removeUser(int gameID, String color) throws DataAccessException {
+        try(var conn = DatabaseManager.getConnection()) {
+            var statement = "UPDATE games SET whiteusername = NULL WHERE gameID = ?";
+            try(var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1,gameID);
+                int changed = ps.executeUpdate();
+                if(changed != 1) {
+                    throw new DataAccessException(400, "Error: something went wrong updating the database");
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException(400, "Error: something went wrong trying to leave game");
+        }
+    }
+
 }
