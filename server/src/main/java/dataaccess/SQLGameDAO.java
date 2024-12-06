@@ -217,10 +217,4 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
-    public void resign(int gameID) throws DataAccessException {
-        ChessGame game = getGame(gameID);
-        game.resign();
-        updateGame(gameID,game);
-    }
-
 }

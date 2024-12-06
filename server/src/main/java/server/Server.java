@@ -46,7 +46,6 @@ public class Server {
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
         Spark.get("/game/:id", this::getGameData);
-        Spark.put("/game/resign/:id", this::resign); //if this is after below line then will map incorrectly (will think resign is :id and cause issues)
         Spark.put("/game/:id/:color", this::userLeave);
         Spark.put("/game/:id", this::updateGame);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
@@ -173,20 +172,6 @@ public class Server {
         }
         ChessGame game = gson.fromJson(req.body(), ChessGame.class);
         gameService.updateGame(gameID, game);
-        res.status(200);
-        return "";
-    }
-
-    private Object resign(Request req, Response res) throws DataAccessException {
-        String authToken = req.headers("authorization");
-        int gameID;
-        authService.checkAuth(authToken);
-        try {
-            gameID = Integer.parseInt(req.params(":id"));
-        } catch (Exception ex) {
-            throw new DataAccessException(400, "Error: something went wrong with game id");
-        }
-        gameService.resign(gameID);
         res.status(200);
         return "";
     }

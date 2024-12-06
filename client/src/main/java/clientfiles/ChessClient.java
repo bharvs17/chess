@@ -324,7 +324,7 @@ public class ChessClient {
         if(line.equalsIgnoreCase("confirm")) {
             try {
                 currentGame.resign();
-                server.resign(currID);
+                server.updateGame(currID,currentGame);
                 return "Successfully resigned.\n";
             } catch (Exception ex) {
                 throw new DataAccessException(400, "Error: could not resign for some reason: " + ex.getMessage() + "\n");

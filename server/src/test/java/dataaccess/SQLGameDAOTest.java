@@ -100,15 +100,4 @@ class SQLGameDAOTest {
         Assertions.assertDoesNotThrow(() -> gdao.updateGame(1000, new ChessGame()));
     }
 
-    @Test
-    void resignBad() throws DataAccessException {
-        gdao.makeGame(new CreateGameReq("game"));
-        Assertions.assertThrows(DataAccessException.class, () -> gdao.resign(0));
-    }
-
-    @Test
-    void resignGood() throws DataAccessException {
-        gdao.makeGame(new CreateGameReq("game"));
-        Assertions.assertDoesNotThrow(() -> gdao.resign(1000));
-    }
 }

@@ -118,15 +118,4 @@ public class MemoryGameDAO implements GameDAO {
         games.put(gameID, new GameData(gameID,white,black,gName,game));
     }
 
-    @Override
-    public void resign(int gameID) throws DataAccessException {
-        GameData data = games.get(gameID);
-        if(data == null) {
-            throw new DataAccessException(400, "Error: the given game id was not found");
-        }
-        ChessGame game = games.get(gameID).game();
-        game.resign();
-        updateGame(gameID, game);
-    }
-
 }
