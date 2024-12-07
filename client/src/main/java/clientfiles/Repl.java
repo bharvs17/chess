@@ -1,13 +1,17 @@
 package clientfiles;
 
+import clientfiles.websocket.ServerMessageHandler;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
+
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements ServerMessageHandler {
 
     private final ChessClient client;
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl);
+        client = new ChessClient(serverUrl, this);
     }
 
     public void run() {
@@ -28,6 +32,11 @@ public class Repl {
         }
         System.out.println();
         System.out.println("Quitting chess application.");
+    }
+
+    public void notify(NotificationMessage msg) {
+        System.out.println(msg.getNotification());
+        //may need to fix text color after this
     }
 
 }

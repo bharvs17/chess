@@ -3,6 +3,7 @@ package clientfiles;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
+import clientfiles.websocket.ServerMessageHandler;
 import exception.DataAccessException;
 import model.*;
 
@@ -14,15 +15,17 @@ public class ChessClient {
 
     private final String url;
     private final ServerFacade server;
+    private final ServerMessageHandler serverMessageHandler;
     private State state;
     private ChessGame currentGame;
     private ChessGame.TeamColor currentColor;
     int currID;
     String currUsername;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl, ServerMessageHandler msgHandler) {
         url = serverUrl;
         server = new ServerFacade(url);
+        serverMessageHandler = msgHandler;
         state = State.SIGNEDOUT;
     }
 
