@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
 import clientfiles.websocket.ServerMessageHandler;
+import clientfiles.websocket.WebSocketFacade;
 import exception.DataAccessException;
 import model.*;
 
@@ -16,10 +17,12 @@ public class ChessClient {
     private final String url;
     private final ServerFacade server;
     private final ServerMessageHandler serverMessageHandler;
+    private WebSocketFacade ws;
     private State state;
     private ChessGame currentGame;
     private ChessGame.TeamColor currentColor;
     int currID;
+    String currAuth;
     String currUsername;
 
     public ChessClient(String serverUrl, ServerMessageHandler msgHandler) {
@@ -119,7 +122,7 @@ public class ChessClient {
     public String register(String... params) throws DataAccessException {
         if(ValidInputChecker.checkRegister(params)) {
             try {
-                server.register(new RegisterReq(params[0], params[1], params[2]));
+                currAuth = server.register(new RegisterReq(params[0], params[1], params[2])).authToken();
                 state = State.SIGNEDIN;
                 currUsername = params[0];
                 return String.format("Registered new user: %s\n", params[0]);
@@ -134,7 +137,7 @@ public class ChessClient {
     public String login(String... params) throws DataAccessException {
         if(ValidInputChecker.checkLogin(params)) {
             try {
-                server.login(new LoginReq(params[0],params[1]));
+                currAuth = server.login(new LoginReq(params[0],params[1])).authToken();
                 state = State.SIGNEDIN;
                 currUsername = params[0];
                 return String.format("Successfully logged in user: %s\n", params[0]);
@@ -149,6 +152,7 @@ public class ChessClient {
     public String logout(String... params) throws DataAccessException {
         if(ValidInputChecker.checkLogout(params)) {
             server.logout();
+            currAuth = null;
             state = State.SIGNEDOUT;
             currUsername = null; //be aware of currID and other curr global vars
             return "Successfully logged out.\n";
@@ -243,6 +247,8 @@ public class ChessClient {
                 currentColor = color;
                 result = result + BoardPrinter.boardString(currentGame, currentColor, false);
                 state = State.PLAYINGGAME;
+                ws = new WebSocketFacade(url, serverMessageHandler);
+                ws.connectToGame(currAuth,currID);
                 return result;
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error joining game: game may not exist or your color was taken by another player\n");
@@ -282,9 +288,11 @@ public class ChessClient {
     public String leave(String... params) throws DataAccessException {
         if(state == State.OBSERVINGGAME) {
             state = State.SIGNEDIN; //ALSO shouldn't receive notification updates when just signed in
+            ws.leaveGame(currAuth,currID);
             currentGame = null;
             currentColor = null;
             currID = -1;
+            ws = null; //should stop sending messages
             return "Successfully left game\n";
         } else {
             state = State.SIGNEDIN;
@@ -294,9 +302,11 @@ public class ChessClient {
             } else {
                 server.leaveGame(currID, "black");
             }
+            ws.leaveGame(currAuth,currID);
             currentColor = null;
             currentGame = null;
             currID = -1;
+            ws = null; //should stop sending messages when leaving game
             return "Successfully left game\n";
         }
     }
@@ -312,6 +322,7 @@ public class ChessClient {
         try {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
             server.updateGame(currID, currentGame);
+            ws.makeMove(currAuth,currID,move);
             return "Successfully made move\n";
         } catch(Exception ex) {
             throw new DataAccessException(400, ex.getMessage());
@@ -328,6 +339,7 @@ public class ChessClient {
             try {
                 currentGame.resign();
                 server.updateGame(currID,currentGame);
+                ws.resignFromGame(currAuth,currID);
                 return "Successfully resigned.\n";
             } catch (Exception ex) {
                 throw new DataAccessException(400, "Error: could not resign for some reason: " + ex.getMessage() + "\n");

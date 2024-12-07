@@ -1,7 +1,9 @@
 package clientfiles.websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.DataAccessException;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -44,6 +46,39 @@ public class WebSocketFacade extends Endpoint {
     public void connectToGame(String authToken, int gameID) throws DataAccessException {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.CONNECT;
+            UserGameCommand command = new UserGameCommand(type,authToken,gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+            this.session.close();
+        } catch(IOException ex) {
+            throw new DataAccessException(500, ex.getMessage());
+        }
+    }
+
+    public void makeMove(String authToken, int gameID, ChessMove move) throws DataAccessException {
+        try {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.MAKE_MOVE;
+            UserGameCommand command = new MakeMoveCommand(type, authToken, gameID, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+            this.session.close();
+        } catch(IOException ex) {
+            throw new DataAccessException(500, ex.getMessage());
+        }
+    }
+
+    public void leaveGame(String authToken, int gameID) throws DataAccessException {
+        try {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.LEAVE;
+            UserGameCommand command = new UserGameCommand(type,authToken,gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+            this.session.close();
+        } catch(IOException ex) {
+            throw new DataAccessException(500, ex.getMessage());
+        }
+    }
+
+    public void resignFromGame(String authToken, int gameID) throws DataAccessException {
+        try {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
             UserGameCommand command = new UserGameCommand(type,authToken,gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
             this.session.close();
