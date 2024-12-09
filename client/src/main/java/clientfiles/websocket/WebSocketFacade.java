@@ -63,7 +63,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.CONNECT;
             UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
-            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+            this.session.getBasicRemote().sendText(new Gson().toJson(command)); //problem here
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
         }

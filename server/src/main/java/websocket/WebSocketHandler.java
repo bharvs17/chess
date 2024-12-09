@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -25,7 +26,12 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand comm = new Gson().fromJson(message, UserGameCommand.class);
+        UserGameCommand comm = new UserGameCommand(UserGameCommand.CommandType.CONNECT,"a",1);
+        try {
+            comm = new Gson().fromJson(message, UserGameCommand.class); //ISSUE HERE SOMEWHERE
+        } catch (JsonSyntaxException e) {
+            System.out.println(e.getMessage());
+        }
         switch(comm.getCommandType()) {
             case CONNECT -> connect(comm,session);
             case RESIGN -> resign(comm,session);

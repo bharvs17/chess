@@ -7,6 +7,7 @@ import clientfiles.websocket.ServerMessageHandler;
 import clientfiles.websocket.WebSocketFacade;
 import exception.DataAccessException;
 import model.*;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -250,7 +251,7 @@ public class ChessClient implements ServerMessageHandler {
                 currentColor = color;
                 result = result + BoardPrinter.boardString(currentGame, currentColor, false);
                 state = State.PLAYINGGAME;
-                ws.connectToGame(currAuth,currID,currUsername,currentColor);
+                ws.connectToGame(currAuth,currID,currUsername,currentColor); //issue here
                 return result;
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error joining game: game may not exist or your color was taken by another player\n");
@@ -364,11 +365,22 @@ public class ChessClient implements ServerMessageHandler {
     }
 
     public void notify(ServerMessage msg) {
-
+        NotificationMessage message = (NotificationMessage) msg;
+        System.out.println(message.getNotification());
     }
 
     public void loadGame(ServerMessage msg) {
+        LoadGameMessage loadGame = (LoadGameMessage) msg;
+        try {
+            updateBoard(loadGame.getGame());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    private void updateBoard(ChessMove move) throws DataAccessException {
+        currentGame = server.getGame(currID);
+        System.out.println(redrawChessBoard("board"));
     }
 
 }
