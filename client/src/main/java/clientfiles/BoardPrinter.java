@@ -17,7 +17,7 @@ public class BoardPrinter {
         ChessBoard board = game.getBoard();
         StringBuilder boardStr = new StringBuilder();
         boardStr.append(SET_TEXT_BOLD);
-        if(color == ChessGame.TeamColor.WHITE) {
+        if(color == ChessGame.TeamColor.WHITE || color == null) {
             boardStr.append(topBottomLine(0));
             for(int i = 8; i > 0; i--) {
                 boardStr.append(rowString(board,i,0,isHighlight));

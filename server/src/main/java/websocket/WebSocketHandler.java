@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
+import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -59,27 +60,34 @@ public class WebSocketHandler {
         String user = command.getUsername();
         String message = String.format("Player %s made move %s to %s",user,start.toString(),end.toString());
         ServerMessage.ServerMessageType moveType = ServerMessage.ServerMessageType.LOAD_GAME;
-        ServerMessage loadGame = new LoadGameMessage()
+        ServerMessage loadGame = new LoadGameMessage(moveType,command.getChessMove());
+        connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(loadGame));
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
         ServerMessage notification = new NotificationMessage(type,message);
         connections.broadcast(command.getAuthToken(), command.getGameID(),new Gson().toJson(notification));
     }
 
-    private void leaveGame(String authToken, Session session) throws IOException {
-        connections.remove(authToken);
-        String message = String.format("User %s has left the game",authToken);
+    private void leaveGame(UserGameCommand comm, Session session) throws IOException {
+        UserColorGameCommand command = (UserColorGameCommand) comm;
+        connections.remove(command.getAuthToken());
+        String message;
+        if(command.getColor() == ChessGame.TeamColor.BLACK || command.getColor() == ChessGame.TeamColor.WHITE) {
+            String color = (command.getColor() == ChessGame.TeamColor.WHITE) ? "White" : "Black";
+            message = String.format("%s player %s has left the game\n",color,command.getUsername());
+        } else {
+            message = String.format("Observer %s has left the game\n",command.getUsername());
+        }
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
-        ServerMessage notif = new NotificationMessage(type,message);
-        connections.broadcast(authToken,new Gson().toJson(notif));
+        ServerMessage notification = new NotificationMessage(type,message);
+        connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(notification));
     }
 
-    private void resign(String authToken, Session session) throws IOException {
-        String message = String.format("User %s has resigned. The game is over.");
+    private void resign(UserGameCommand comm, Session session) throws IOException {
+        UserColorGameCommand command = (UserColorGameCommand) comm;
+        String color = (command.getColor() == ChessGame.TeamColor.WHITE) ? "White" : "Black";
+        String message = String.format("%s player %s has resigned. The game is now over\n",color,command.getUsername());
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
-        ServerMessage notif = new NotificationMessage(type,message);
-        connections.broadcast(authToken,new Gson().toJson(notif));
-        //probably also need to broadcast a load game message so other clients
-        //update to know the game is over (if game isn't loaded after someone resigns then
-        //other player should be able to make 1 more move and will screw things up)
+        ServerMessage notification = new NotificationMessage(type,message);
+        connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(notification));
     }
 }

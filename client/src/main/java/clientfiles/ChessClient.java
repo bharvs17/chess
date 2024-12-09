@@ -7,16 +7,17 @@ import clientfiles.websocket.ServerMessageHandler;
 import clientfiles.websocket.WebSocketFacade;
 import exception.DataAccessException;
 import model.*;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageHandler {
 
     private final String url;
     private final ServerFacade server;
-    private final ServerMessageHandler serverMessageHandler;
     private WebSocketFacade ws;
     private State state;
     private ChessGame currentGame;
@@ -28,10 +29,9 @@ public class ChessClient {
     //instead of storing data locally, should have created private method in this class to get any necessary data from server
     //(maybe just store username here, and use that in method calls to get the ChessGame or auth token)
 
-    public ChessClient(String serverUrl, ServerMessageHandler msgHandler) {
+    public ChessClient(String serverUrl) {
         url = serverUrl;
         server = new ServerFacade(url);
-        serverMessageHandler = msgHandler;
         state = State.SIGNEDOUT;
     }
 
@@ -83,8 +83,6 @@ public class ChessClient {
         }
     }
 
-
-
     public String help() {
         if(state == State.SIGNEDOUT) {
             return """
@@ -128,7 +126,7 @@ public class ChessClient {
                 currAuth = server.register(new RegisterReq(params[0], params[1], params[2])).authToken();
                 state = State.SIGNEDIN;
                 currUsername = params[0];
-                ws = new WebSocketFacade(url, serverMessageHandler);
+                ws = new WebSocketFacade(url, this);
                 ws.send("new user registered");
                 return String.format("Registered new user: %s\n", params[0]);
             } catch(DataAccessException ex) {
@@ -252,7 +250,6 @@ public class ChessClient {
                 currentColor = color;
                 result = result + BoardPrinter.boardString(currentGame, currentColor, false);
                 state = State.PLAYINGGAME;
-                ws = new WebSocketFacade(url, serverMessageHandler);
                 ws.connectToGame(currAuth,currID,currUsername,currentColor);
                 return result;
             } catch(Exception ex) {
@@ -269,17 +266,16 @@ public class ChessClient {
             try {
                 reqNum = Integer.parseInt(params[1]);
                 ArrayList<GameInfo> games = getListOfGames();
-                int gameID = games.get(reqNum-1).gameID();
+                int gameID = games.get(reqNum - 1).gameID();
                 currID = gameID;
                 currentGame = server.getGame(gameID);
+                state = State.OBSERVINGGAME;
+                currentColor = null;
+                ws.connectToGame(currAuth, currID, currUsername, null);
+                return BoardPrinter.boardString(currentGame, currentColor, false);
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error: enter a valid game number\n");
             }
-            state = State.OBSERVINGGAME;
-            currentColor = ChessGame.TeamColor.WHITE;
-            ws = new WebSocketFacade(url, serverMessageHandler);
-            ws.connectToGame(currAuth,currID);
-            return BoardPrinter.boardString(currentGame, currentColor, false);
         } else {
             throw new DataAccessException(400, "Error: expected observe game <game number>\n");
         }
@@ -296,11 +292,10 @@ public class ChessClient {
     public String leave(String... params) throws DataAccessException {
         if(state == State.OBSERVINGGAME) {
             state = State.SIGNEDIN; //ALSO shouldn't receive notification updates when just signed in
-            ws.leaveGame(currAuth,currID);
+            ws.leaveGame(currAuth,currID,currUsername,currentColor);
             currentGame = null;
             currentColor = null;
             currID = -1;
-            ws = null; //should stop sending messages
             return "Successfully left game\n";
         } else {
             state = State.SIGNEDIN;
@@ -310,7 +305,7 @@ public class ChessClient {
             } else {
                 server.leaveGame(currID, "black");
             }
-            ws.leaveGame(currAuth,currID);
+            ws.leaveGame(currAuth,currID,currUsername,currentColor);
             currentColor = null;
             currentGame = null;
             currID = -1;
@@ -320,6 +315,7 @@ public class ChessClient {
     }
 
     public String makeMove(String... params) throws DataAccessException {
+        currentGame = server.getGame(currID); //should prevent other player from making a move after other player resigns
         ChessMove move = ValidInputChecker.checkMakeMove(currentGame,params);
         if(currentGame.isGameOver()) {
             throw new DataAccessException(400, "Error: the game is over. No moves can be made\n");
@@ -330,7 +326,7 @@ public class ChessClient {
         try {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
             server.updateGame(currID, currentGame);
-            ws.makeMove(currAuth,currID,move);
+            ws.makeMove(currAuth,currID,currUsername,move);
             String result = redrawChessBoard("board") + "\n";
             result = result + "Successfully made move " + move.getStartPosition().toString();
             result = result + " to " + move.getEndPosition().toString() + "\n";
@@ -350,7 +346,7 @@ public class ChessClient {
             try {
                 currentGame.resign();
                 server.updateGame(currID,currentGame);
-                ws.resignFromGame(currAuth,currID);
+                ws.resignFromGame(currAuth,currID,currUsername,currentColor);
                 return "Successfully resigned.\n";
             } catch (Exception ex) {
                 throw new DataAccessException(400, "Error: could not resign for some reason: " + ex.getMessage() + "\n");
@@ -365,6 +361,14 @@ public class ChessClient {
         int row = Integer.parseInt(String.valueOf(params[2].charAt(1)));
         int col = ValidInputChecker.colConverter(String.valueOf(params[2].charAt(0)));
         return BoardPrinter.highlightMoves(currentGame, currentColor, row, col, moves);
+    }
+
+    public void notify(ServerMessage msg) {
+
+    }
+
+    public void loadGame(ServerMessage msg) {
+
     }
 
 }

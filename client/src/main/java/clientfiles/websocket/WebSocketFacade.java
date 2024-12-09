@@ -7,6 +7,7 @@ import exception.DataAccessException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserColorGameCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -18,21 +19,26 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
 
     Session session;
-    ServerMessageHandler notificationHandler;
+    ServerMessageHandler msgHandler;
 
     public WebSocketFacade(String url, ServerMessageHandler handler) throws DataAccessException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            notificationHandler = handler;
+            msgHandler = handler;
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
             //set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    NotificationMessage notif = new Gson().fromJson(message, NotificationMessage.class);
-                    notificationHandler.notify(notif);
+                    ServerMessage msg = new Gson().fromJson(message, ServerMessage.class);
+                    //notificationHandler.notify(msg);
+                    if(msg instanceof NotificationMessage) {
+                        msgHandler.notify(msg);
+                    } else if(msg instanceof LoadGameMessage) {
+                        msgHandler.loadGame(msg);
+                    }
                 }
             });
         } catch(DeploymentException | IOException | URISyntaxException ex) {
@@ -63,20 +69,20 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, int gameID, ChessMove move) throws DataAccessException {
+    public void makeMove(String authToken, int gameID, String username, ChessMove move) throws DataAccessException {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.MAKE_MOVE;
-            UserGameCommand command = new MakeMoveCommand(type, authToken, gameID, move);
+            UserGameCommand command = new MakeMoveCommand(type, authToken, gameID, username, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
         }
     }
 
-    public void leaveGame(String authToken, int gameID) throws DataAccessException {
+    public void leaveGame(String authToken, int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.LEAVE;
-            UserGameCommand command = new UserGameCommand(type,authToken,gameID);
+            UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
             this.session.close();
         } catch(IOException ex) {
@@ -84,10 +90,10 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void resignFromGame(String authToken, int gameID) throws DataAccessException {
+    public void resignFromGame(String authToken, int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
-            UserGameCommand command = new UserGameCommand(type,authToken,gameID);
+            UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
