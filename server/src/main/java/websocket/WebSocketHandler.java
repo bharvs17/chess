@@ -54,9 +54,9 @@ public class WebSocketHandler {
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
         ServerMessage notification = new NotificationMessage(type,message);
         connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(notification));
-        //this should be good (should get the game status in ChessClient), now implement for make move, leave, resign
-        //also need to make sure Repl class prints server messages properly
-        //and then need to make sure load game messages make client send request to server to get latest chess game data
+        ServerMessage.ServerMessageType loadType = ServerMessage.ServerMessageType.LOAD_GAME;
+        ServerMessage loadGame = new LoadGameMessage(loadType,new ChessMove(new ChessPosition(1,1),new ChessPosition(2,2),null));
+        session.getRemote().sendString(new Gson().toJson(loadGame));
     }
 
     private void makeMove(MakeMoveCommand command, Session session) throws IOException {

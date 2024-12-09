@@ -249,8 +249,8 @@ public class ChessClient implements ServerMessageHandler {
                 server.joinGame(new JoinGameReq(color, gameID));
                 currentGame = server.getGame(gameID);
                 currentColor = color;
-                String result = BoardPrinter.boardString(currentGame, currentColor, false);
-                result = result + "\nSuccessfully joined game\n";
+                //String result = BoardPrinter.boardString(currentGame, currentColor, false);
+                String result = "\nSuccessfully joined game\n";
                 state = State.PLAYINGGAME;
                 ws.connectToGame(currAuth,currID,currUsername,currentColor); //issue here
                 return result;
