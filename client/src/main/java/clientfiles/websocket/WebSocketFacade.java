@@ -1,9 +1,11 @@
 package clientfiles.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.DataAccessException;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserColorGameCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -20,7 +22,7 @@ public class WebSocketFacade extends Endpoint {
 
     public WebSocketFacade(String url, ServerMessageHandler handler) throws DataAccessException {
         try {
-            url = url.replace("http","ws");
+            url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             notificationHandler = handler;
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -42,13 +44,20 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
+    public void send(String msg) throws DataAccessException {
+        try {
+            this.session.getBasicRemote().sendText(msg);
+        } catch (IOException e) {
+            throw new DataAccessException(500, "Error: something went wrong");
+        }
+    }
+
     //methods to be called from client to server (user game commands)
-    public void connectToGame(String authToken, int gameID) throws DataAccessException {
+    public void connectToGame(String authToken, int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.CONNECT;
-            UserGameCommand command = new UserGameCommand(type,authToken,gameID);
+            UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            this.session.close();
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
         }
@@ -59,7 +68,6 @@ public class WebSocketFacade extends Endpoint {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.MAKE_MOVE;
             UserGameCommand command = new MakeMoveCommand(type, authToken, gameID, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            this.session.close();
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
         }
@@ -81,9 +89,9 @@ public class WebSocketFacade extends Endpoint {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
             UserGameCommand command = new UserGameCommand(type,authToken,gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            this.session.close();
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
         }
     }
+
 }

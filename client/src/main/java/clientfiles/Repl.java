@@ -2,7 +2,6 @@ package clientfiles;
 
 import clientfiles.websocket.ServerMessageHandler;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
@@ -35,7 +34,7 @@ public class Repl implements ServerMessageHandler {
     }
 
     public void notify(NotificationMessage msg) {
-        System.out.println(msg.getNotification());
+        System.out.println("Received message: " + msg.getNotification() + "\n");
         //may need to fix text color after this
     }
 

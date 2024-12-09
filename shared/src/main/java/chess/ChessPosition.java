@@ -38,7 +38,19 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "(" + row + "," + col + ")";
+        //return "(" + row + "," + col + ")";
+        String colLetter = "Z";
+        switch(col) {
+            case 1 -> colLetter = "A";
+            case 2 -> colLetter = "B";
+            case 3 -> colLetter = "C";
+            case 4 -> colLetter = "D";
+            case 5 -> colLetter = "E";
+            case 6 -> colLetter = "F";
+            case 7 -> colLetter = "G";
+            case 8 -> colLetter = "H";
+        }
+        return String.format("%s%d",colLetter,row);
     }
 
     //equals and hash functions

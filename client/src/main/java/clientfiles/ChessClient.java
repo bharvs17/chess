@@ -25,6 +25,9 @@ public class ChessClient {
     String currAuth;
     String currUsername;
 
+    //instead of storing data locally, should have created private method in this class to get any necessary data from server
+    //(maybe just store username here, and use that in method calls to get the ChessGame or auth token)
+
     public ChessClient(String serverUrl, ServerMessageHandler msgHandler) {
         url = serverUrl;
         server = new ServerFacade(url);
@@ -125,6 +128,8 @@ public class ChessClient {
                 currAuth = server.register(new RegisterReq(params[0], params[1], params[2])).authToken();
                 state = State.SIGNEDIN;
                 currUsername = params[0];
+                ws = new WebSocketFacade(url, serverMessageHandler);
+                ws.send("new user registered");
                 return String.format("Registered new user: %s\n", params[0]);
             } catch(DataAccessException ex) {
                 throw new DataAccessException(400, "Error: username already taken\n");
@@ -248,7 +253,7 @@ public class ChessClient {
                 result = result + BoardPrinter.boardString(currentGame, currentColor, false);
                 state = State.PLAYINGGAME;
                 ws = new WebSocketFacade(url, serverMessageHandler);
-                ws.connectToGame(currAuth,currID);
+                ws.connectToGame(currAuth,currID,currUsername,currentColor);
                 return result;
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error joining game: game may not exist or your color was taken by another player\n");
@@ -265,12 +270,15 @@ public class ChessClient {
                 reqNum = Integer.parseInt(params[1]);
                 ArrayList<GameInfo> games = getListOfGames();
                 int gameID = games.get(reqNum-1).gameID();
+                currID = gameID;
                 currentGame = server.getGame(gameID);
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error: enter a valid game number\n");
             }
             state = State.OBSERVINGGAME;
             currentColor = ChessGame.TeamColor.WHITE;
+            ws = new WebSocketFacade(url, serverMessageHandler);
+            ws.connectToGame(currAuth,currID);
             return BoardPrinter.boardString(currentGame, currentColor, false);
         } else {
             throw new DataAccessException(400, "Error: expected observe game <game number>\n");
@@ -323,7 +331,10 @@ public class ChessClient {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
             server.updateGame(currID, currentGame);
             ws.makeMove(currAuth,currID,move);
-            return "Successfully made move\n";
+            String result = redrawChessBoard("board") + "\n";
+            result = result + "Successfully made move " + move.getStartPosition().toString();
+            result = result + " to " + move.getEndPosition().toString() + "\n";
+            return result;
         } catch(Exception ex) {
             throw new DataAccessException(400, ex.getMessage());
         }
