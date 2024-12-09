@@ -26,30 +26,30 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand comm = new UserGameCommand(UserGameCommand.CommandType.CONNECT,"a",1);
-        try {
-            comm = new Gson().fromJson(message, UserGameCommand.class); //ISSUE HERE SOMEWHERE
-        } catch (JsonSyntaxException e) {
-            System.out.println(e.getMessage());
+        UserGameCommand comm = new Gson().fromJson(message, UserGameCommand.class);
+        if(comm.getCommandType() == UserGameCommand.CommandType.CONNECT) {
+            UserColorGameCommand command = new Gson().fromJson(message, UserColorGameCommand.class);
+            connect(command,session);
+        } else if(comm.getCommandType() == UserGameCommand.CommandType.RESIGN) {
+            UserColorGameCommand command = new Gson().fromJson(message, UserColorGameCommand.class);
+            resign(command,session);
+        } else if(comm.getCommandType() == UserGameCommand.CommandType.LEAVE) {
+            UserColorGameCommand command = new Gson().fromJson(message, UserColorGameCommand.class);
+            leaveGame(command,session);
+        } else { //make move
+            MakeMoveCommand command = new Gson().fromJson(message, MakeMoveCommand.class);
+            makeMove(command,session);
         }
-        switch(comm.getCommandType()) {
-            case CONNECT -> connect(comm,session);
-            case RESIGN -> resign(comm,session);
-            case LEAVE -> leaveGame(comm,session);
-            case MAKE_MOVE -> makeMove(comm,session);
-        }
-
     }
 
-    private void connect(UserGameCommand comm, Session session) throws IOException {
-        UserColorGameCommand command = (UserColorGameCommand) comm;
+    private void connect(UserColorGameCommand command, Session session) throws IOException {
         connections.add(command.getAuthToken(),command.getGameID(),session);
         String message;
         if(command.getColor() != null) {
             String color = (command.getColor() == ChessGame.TeamColor.WHITE) ? "white" : "black";
-            message = String.format("Player %s has joined as %s",command.getUsername(),color);
+            message = String.format("Player %s has joined as %s%n",command.getUsername(),color);
         } else {
-            message = String.format("User %s started observing the game",command.getUsername());
+            message = String.format("User %s started observing the game%n",command.getUsername());
         }
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
         ServerMessage notification = new NotificationMessage(type,message);
@@ -59,12 +59,11 @@ public class WebSocketHandler {
         //and then need to make sure load game messages make client send request to server to get latest chess game data
     }
 
-    private void makeMove(UserGameCommand comm, Session session) throws IOException {
-        MakeMoveCommand command = (MakeMoveCommand) comm;
+    private void makeMove(MakeMoveCommand command, Session session) throws IOException {
         ChessPosition start = command.getChessMove().getStartPosition();
         ChessPosition end = command.getChessMove().getEndPosition();
         String user = command.getUsername();
-        String message = String.format("Player %s made move %s to %s",user,start.toString(),end.toString());
+        String message = String.format("Player %s made move %s to %s%n",user,start.toString(),end.toString());
         ServerMessage.ServerMessageType moveType = ServerMessage.ServerMessageType.LOAD_GAME;
         ServerMessage loadGame = new LoadGameMessage(moveType,command.getChessMove());
         connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(loadGame));
@@ -73,8 +72,7 @@ public class WebSocketHandler {
         connections.broadcast(command.getAuthToken(), command.getGameID(),new Gson().toJson(notification));
     }
 
-    private void leaveGame(UserGameCommand comm, Session session) throws IOException {
-        UserColorGameCommand command = (UserColorGameCommand) comm;
+    private void leaveGame(UserColorGameCommand command, Session session) throws IOException {
         connections.remove(command.getAuthToken());
         String message;
         if(command.getColor() == ChessGame.TeamColor.BLACK || command.getColor() == ChessGame.TeamColor.WHITE) {
@@ -88,8 +86,7 @@ public class WebSocketHandler {
         connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(notification));
     }
 
-    private void resign(UserGameCommand comm, Session session) throws IOException {
-        UserColorGameCommand command = (UserColorGameCommand) comm;
+    private void resign(UserColorGameCommand command, Session session) throws IOException {
         String color = (command.getColor() == ChessGame.TeamColor.WHITE) ? "White" : "Black";
         String message = String.format("%s player %s has resigned. The game is now over\n",color,command.getUsername());
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;

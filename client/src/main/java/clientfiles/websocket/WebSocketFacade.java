@@ -33,11 +33,10 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage msg = new Gson().fromJson(message, ServerMessage.class);
-                    //notificationHandler.notify(msg);
-                    if(msg instanceof NotificationMessage) {
-                        msgHandler.notify(msg);
-                    } else if(msg instanceof LoadGameMessage) {
-                        msgHandler.loadGame(msg);
+                    if(msg.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                        msgHandler.notify(new Gson().fromJson(message,NotificationMessage.class));
+                    } else {
+                        msgHandler.loadGame(new Gson().fromJson(message,LoadGameMessage.class));
                     }
                 }
             });
@@ -50,18 +49,11 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void send(String msg) throws DataAccessException {
-        try {
-            this.session.getBasicRemote().sendText(msg);
-        } catch (IOException e) {
-            throw new DataAccessException(500, "Error: something went wrong");
-        }
-    }
-
     //methods to be called from client to server (user game commands)
     public void connectToGame(String authToken, int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.CONNECT;
+            //UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
             UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command)); //problem here
         } catch(IOException ex) {

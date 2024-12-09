@@ -77,7 +77,7 @@ public class BoardPrinter {
         topLine.append("\n");
         return topLine.toString();
     }
-
+    //int co is color- 0 for white, 1 for black
     private static String rowString(ChessBoard board, int row, int co, boolean isHighlight) {
         StringBuilder rowString = new StringBuilder();
         String initialColor;
@@ -93,7 +93,7 @@ public class BoardPrinter {
                 rowString.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_MAGENTA).append(row).append(" ");
                 for(int h = 1; h < 9; h++) {
                     String tempColor = currColor;
-                    currColor = preRightColor(row-1,h-1,tempColor,isHighlight);
+                    currColor = preRightColor(row-1,h-1,tempColor,co,isHighlight);
                     rowString.append(currColor).append(" ".repeat(3));
                     rowString.append(pieceString(board,row,h,co));
                     rowString.append(currColor).append(" ".repeat(3));
@@ -110,7 +110,7 @@ public class BoardPrinter {
                 rowString.append(SET_BG_COLOR_DARK_GREY).append("  ");
                 for(int j = 0; j < 8; j++) {
                     String tempColor = currColor;
-                    currColor = preRightColor(row-1,j,tempColor,isHighlight);
+                    currColor = preRightColor(row-1,j,tempColor,co,isHighlight);
                     rowString.append(currColor).append(" ".repeat(7));
                     currColor = tempColor;
                     if(currColor.equals(SET_BG_COLOR_LIGHT_GREY)) {
@@ -126,14 +126,27 @@ public class BoardPrinter {
         return rowString.toString();
     }
 
-    private static String preRightColor(int row, int col, String origColor, boolean isHighlight) {
+    private static String preRightColor(int row, int col, String origColor, int playerColor, boolean isHighlight) {
         if(!isHighlight) {
             return origColor;
-        } else {
-            if(highlight[row][col] == 2) {
+        }
+        if(playerColor == 0) {
+            if (highlight[row][col] == 2) {
                 return SET_BG_COLOR_YELLOW;
-            } else if(highlight[row][col] == 1) {
-                if(origColor.equals(SET_BG_COLOR_BLACK)) {
+            } else if (highlight[row][col] == 1) {
+                if (origColor.equals(SET_BG_COLOR_BLACK)) {
+                    return SET_BG_COLOR_DARK_GREEN;
+                } else {
+                    return SET_BG_COLOR_GREEN;
+                }
+            } else {
+                return origColor;
+            }
+        } else {
+            if (highlight[row][7-col] == 2) {
+                return SET_BG_COLOR_YELLOW;
+            } else if (highlight[row][7-col] == 1) {
+                if (origColor.equals(SET_BG_COLOR_BLACK)) {
                     return SET_BG_COLOR_DARK_GREEN;
                 } else {
                     return SET_BG_COLOR_GREEN;

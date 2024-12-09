@@ -2,6 +2,7 @@ package clientfiles;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import clientfiles.websocket.ServerMessageHandler;
 import clientfiles.websocket.WebSocketFacade;
@@ -11,6 +12,7 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import javax.websocket.MessageHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -128,7 +130,6 @@ public class ChessClient implements ServerMessageHandler {
                 state = State.SIGNEDIN;
                 currUsername = params[0];
                 ws = new WebSocketFacade(url, this);
-                ws.send("new user registered");
                 return String.format("Registered new user: %s\n", params[0]);
             } catch(DataAccessException ex) {
                 throw new DataAccessException(400, "Error: username already taken\n");
@@ -247,9 +248,9 @@ public class ChessClient implements ServerMessageHandler {
                 currID = gameID;
                 server.joinGame(new JoinGameReq(color, gameID));
                 currentGame = server.getGame(gameID);
-                String result = "Successfully joined game\n";
                 currentColor = color;
-                result = result + BoardPrinter.boardString(currentGame, currentColor, false);
+                String result = BoardPrinter.boardString(currentGame, currentColor, false);
+                result = result + "\nSuccessfully joined game\n";
                 state = State.PLAYINGGAME;
                 ws.connectToGame(currAuth,currID,currUsername,currentColor); //issue here
                 return result;
@@ -322,7 +323,7 @@ public class ChessClient implements ServerMessageHandler {
             throw new DataAccessException(400, "Error: the game is over. No moves can be made\n");
         }
         if(currentGame.getTeamTurn() != currentColor) {
-            throw new DataAccessException(400, "Error: it is not your turn OR you cannot move the other team's piece\n");
+            throw new DataAccessException(400, "Error: Invalid move- either it is not your turn OR you cannot move the other team's piece\n");
         }
         try {
             currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
@@ -331,9 +332,10 @@ public class ChessClient implements ServerMessageHandler {
             String result = redrawChessBoard("board") + "\n";
             result = result + "Successfully made move " + move.getStartPosition().toString();
             result = result + " to " + move.getEndPosition().toString() + "\n";
+            result = result + statusChecker(currentGame);
             return result;
         } catch(Exception ex) {
-            throw new DataAccessException(400, ex.getMessage());
+            throw new DataAccessException(400, ex.getMessage() + "\n");
         }
 
     }
@@ -366,13 +368,21 @@ public class ChessClient implements ServerMessageHandler {
 
     public void notify(ServerMessage msg) {
         NotificationMessage message = (NotificationMessage) msg;
-        System.out.println(message.getNotification());
+        if(message.getNotification().contains("resign")) {
+            currentGame.resign();
+            System.out.println(BoardPrinter.boardString(currentGame,currentColor,false));
+        }
+        System.out.print(message.getNotification());
+        System.out.print(">>> ");
     }
 
     public void loadGame(ServerMessage msg) {
         LoadGameMessage loadGame = (LoadGameMessage) msg;
         try {
+            System.out.println("");
             updateBoard(loadGame.getGame());
+            System.out.print(statusChecker(currentGame));
+            System.out.print(">>> ");
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -381,6 +391,24 @@ public class ChessClient implements ServerMessageHandler {
     private void updateBoard(ChessMove move) throws DataAccessException {
         currentGame = server.getGame(currID);
         System.out.println(redrawChessBoard("board"));
+    }
+
+    private String statusChecker(ChessGame game) {
+        String statusMsg = "";
+        if(game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            statusMsg = "White is in checkmate. Black wins\n";
+        } else if(game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            statusMsg = "Black is in checkmate. White wins\n";
+        } else if(game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+            statusMsg = "White is in stalemate. The game ends in a draw\n";
+        } else if(game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            statusMsg = "Black is in stalemate. The game ends in a draw\n";
+        } else if(game.isInCheck(ChessGame.TeamColor.WHITE)) {
+            statusMsg = "White is in check\n";
+        } else if(game.isInCheck(ChessGame.TeamColor.BLACK)) {
+            statusMsg = "Black is in check\n";
+        }
+        return statusMsg;
     }
 
 }
