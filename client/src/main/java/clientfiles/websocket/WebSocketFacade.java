@@ -39,6 +39,7 @@ public class WebSocketFacade extends Endpoint {
                     } else if(msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
                         msgHandler.loadGame(new Gson().fromJson(message,LoadGameMessage.class));
                     } else {
+                        System.out.println("sending error message to client");
                         msgHandler.error(new Gson().fromJson(message, ErrorMessage.class));
                     }
                 }

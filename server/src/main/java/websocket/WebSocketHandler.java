@@ -5,11 +5,13 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import model.AuthData;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.helpers.NOPLogger;
+import service.AuthService;
 import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserColorGameCommand;
@@ -25,10 +27,12 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
-    private final GameService service;
+    private final GameService gameService;
+    private final AuthService authService;
 
-    public WebSocketHandler(GameService service) {
-        this.service = service;
+    public WebSocketHandler(GameService gameService, AuthService authService) {
+        this.gameService = gameService;
+        this.authService = authService;
     }
 
     @OnWebSocketMessage
@@ -55,7 +59,8 @@ public class WebSocketHandler {
 
     private void connect(UserColorGameCommand command, Session session) throws IOException {
         try {
-            service.getGame(command.getGameID());
+            gameService.getGame(command.getGameID());
+            authService.checkAuth(command.getAuthToken());
         } catch(Exception ex) {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
             UserColorGameCommand comm = new UserColorGameCommand(null,null,0,"Error: game doesn't exist or color already taken",null);
@@ -117,7 +122,6 @@ public class WebSocketHandler {
         //System.out.println("err message (username): " + command.getUsername());
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.ERROR;
         ErrorMessage err = new ErrorMessage(type,command.getUsername());
-        System.out.println("sending error msg from server with error: " + err.getErrorMessage());
         session.getRemote().sendString(new Gson().toJson(err));
     }
 }
