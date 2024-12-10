@@ -29,6 +29,7 @@ public class ChessClient implements ServerMessageHandler {
     int currID;
     String currAuth;
     String currUsername;
+    boolean success;
 
     //instead of storing data locally, should have created private method in this class to get any necessary data from server
     //(maybe just store username here, and use that in method calls to get the ChessGame or auth token)
@@ -37,6 +38,7 @@ public class ChessClient implements ServerMessageHandler {
         url = serverUrl;
         server = new ServerFacade(url);
         state = State.SIGNEDOUT;
+        success = true;
     }
 
     public String eval(String input) {
@@ -256,7 +258,9 @@ public class ChessClient implements ServerMessageHandler {
                 ws.connectToGame(currAuth,currID,currUsername,currentColor); //issue here
                 return result;
             } catch(Exception ex) {
-                throw new DataAccessException(400, "Error joining game: game may not exist or your color was taken by another player\n");
+                //throw new DataAccessException(400, "Error joining game: game may not exist or your color was taken by another player\n");
+                ws.error(currAuth);
+                return "";
             }
         } else {
             throw new DataAccessException(400, "Error: expected play game <game number> <white/black>\n");
@@ -392,6 +396,7 @@ public class ChessClient implements ServerMessageHandler {
     public void error(ServerMessage msg) {
         ErrorMessage err = (ErrorMessage) msg;
         System.out.println(err.getErrorMessage());
+        System.out.print(">>> ");
     }
 
     private void updateBoard(ChessMove move) throws DataAccessException {

@@ -28,7 +28,7 @@ public class Server {
             this.userService = new UserService(new SQLUserDAO());
             this.authService = new AuthService(new SQLAuthDAO());
             this.gameService = new GameService(new SQLGameDAO());
-            webSocketHandler = new WebSocketHandler();
+            webSocketHandler = new WebSocketHandler(gameService);
         } catch(DataAccessException e) {
             throw new RuntimeException(e);
         }

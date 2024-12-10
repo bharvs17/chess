@@ -10,9 +10,11 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.helpers.NOPLogger;
+import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserColorGameCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -23,6 +25,11 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
+    private final GameService service;
+
+    public WebSocketHandler(GameService service) {
+        this.service = service;
+    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
@@ -32,7 +39,11 @@ public class WebSocketHandler {
             connect(command,session);
         } else if(comm.getCommandType() == UserGameCommand.CommandType.RESIGN) {
             UserColorGameCommand command = new Gson().fromJson(message, UserColorGameCommand.class);
-            resign(command,session);
+            if(command.getGameID() == -99) {
+                sendError(command,session);
+            } else {
+                resign(command, session);
+            }
         } else if(comm.getCommandType() == UserGameCommand.CommandType.LEAVE) {
             UserColorGameCommand command = new Gson().fromJson(message, UserColorGameCommand.class);
             leaveGame(command,session);
@@ -43,6 +54,14 @@ public class WebSocketHandler {
     }
 
     private void connect(UserColorGameCommand command, Session session) throws IOException {
+        try {
+            service.getGame(command.getGameID());
+        } catch(Exception ex) {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
+            UserColorGameCommand comm = new UserColorGameCommand(null,null,0,"Error: game doesn't exist or color already taken",null);
+            sendError(comm,session);
+            return;
+        }
         connections.add(command.getAuthToken(),command.getGameID(),session);
         String message;
         if(command.getColor() != null) {
@@ -92,5 +111,13 @@ public class WebSocketHandler {
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
         ServerMessage notification = new NotificationMessage(type,message);
         connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(notification));
+    }
+
+    private void sendError(UserColorGameCommand command, Session session) throws IOException {
+        //System.out.println("err message (username): " + command.getUsername());
+        ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.ERROR;
+        ErrorMessage err = new ErrorMessage(type,command.getUsername());
+        System.out.println("sending error msg from server with error: " + err.getErrorMessage());
+        session.getRemote().sendString(new Gson().toJson(err));
     }
 }

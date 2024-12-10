@@ -7,6 +7,7 @@ import exception.DataAccessException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserColorGameCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -35,10 +36,13 @@ public class WebSocketFacade extends Endpoint {
                     ServerMessage msg = new Gson().fromJson(message, ServerMessage.class);
                     if(msg.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
                         msgHandler.notify(new Gson().fromJson(message,NotificationMessage.class));
-                    } else {
+                    } else if(msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
                         msgHandler.loadGame(new Gson().fromJson(message,LoadGameMessage.class));
+                    } else {
+                        msgHandler.error(new Gson().fromJson(message, ErrorMessage.class));
                     }
                 }
+
             });
         } catch(DeploymentException | IOException | URISyntaxException ex) {
             throw new DataAccessException(500, ex.getMessage());
@@ -88,6 +92,16 @@ public class WebSocketFacade extends Endpoint {
             UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch(IOException ex) {
+            throw new DataAccessException(500, ex.getMessage());
+        }
+    }
+
+    public void error(String auth) throws DataAccessException {
+        try {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
+            UserGameCommand command = new UserColorGameCommand(type,auth,-99,"Error: game doesn't exist or selected color was already taken",null);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
         }
     }
