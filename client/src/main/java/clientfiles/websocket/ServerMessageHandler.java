@@ -6,6 +6,7 @@ import websocket.messages.ServerMessage;
 public interface ServerMessageHandler {
     void notify(ServerMessage msg);
     void loadGame(ServerMessage msg);
+    void error(ServerMessage msg);
     //may need to add another method to handle getting chess game?
     //(load game message) and maybe error message?
 }

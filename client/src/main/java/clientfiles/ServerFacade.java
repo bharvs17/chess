@@ -49,6 +49,8 @@ public class ServerFacade {
     public void joinGame(JoinGameReq req) throws DataAccessException {
         String path = "/game";
         this.makeRequest("PUT", path, authToken, req, null);
+        //ws CONNECT
+        //put the request into json, then the user command into json, put into array, turn array into json, then send
     }
 
     public void deleteAll() throws DataAccessException {
@@ -64,11 +66,14 @@ public class ServerFacade {
     public void leaveGame(int gameID, String color) throws DataAccessException {
         String path = "/game/" + gameID + "/" + color;
         this.makeRequest("PUT",path,authToken,null,null);
+        //ws LEAVE
     }
 
     public void updateGame(int gameID, ChessGame game) throws DataAccessException {
         String path = "/game/" + gameID;
         this.makeRequest("PUT",path,authToken,game,null);
+        //ws MAKE_MOVE or RESIGN
+
     }
 
     private <T> T makeRequest(String method, String path, String token, Object request, Class<T> responseClass) throws DataAccessException {

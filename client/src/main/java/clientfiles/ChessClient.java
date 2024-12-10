@@ -8,6 +8,7 @@ import clientfiles.websocket.ServerMessageHandler;
 import clientfiles.websocket.WebSocketFacade;
 import exception.DataAccessException;
 import model.*;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -386,6 +387,11 @@ public class ChessClient implements ServerMessageHandler {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void error(ServerMessage msg) {
+        ErrorMessage err = (ErrorMessage) msg;
+        System.out.println(err.getErrorMessage());
     }
 
     private void updateBoard(ChessMove move) throws DataAccessException {
