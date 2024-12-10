@@ -27,7 +27,7 @@ import java.nio.file.DirectoryNotEmptyException;
 
 @WebSocket
 public class WebSocketHandler {
-
+    //everything should be complete
     private final ConnectionManager connections = new ConnectionManager();
     private final GameService gameService;
     private final AuthService authService;
