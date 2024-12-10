@@ -5,6 +5,7 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import exception.DataAccessException;
 import model.AuthData;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.websocket.api.Session;
@@ -22,6 +23,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 
 @WebSocket
 public class WebSocketHandler {
@@ -84,19 +86,49 @@ public class WebSocketHandler {
     }
 
     private void makeMove(MakeMoveCommand command, Session session) throws IOException {
+        try {
+            authService.checkAuth(command.getAuthToken());
+            ChessGame.TeamColor color = gameService.getPlayerColor(command.getGameID(), authService.getUsername(command.getAuthToken()));
+            ChessGame game = gameService.getGame(command.getGameID());
+            System.out.println(game.getBoard().getPiece(command.getChessMove().getStartPosition()).getTeamColor());
+            if(color != game.getBoard().getPiece(command.getChessMove().getStartPosition()).getTeamColor()) {
+                throw new Exception("bad move");
+            }
+            game.makeMove(command.getChessMove());
+            gameService.updateGame(command.getGameID(),game);
+        } catch(Exception ex) {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
+            UserColorGameCommand comm = new UserColorGameCommand(null,null,0,"Error: invalid move",null);
+            sendError(comm,session);
+            return;
+        }
         ChessPosition start = command.getChessMove().getStartPosition();
         ChessPosition end = command.getChessMove().getEndPosition();
         String user = command.getUsername();
         String message = String.format("Player %s made move %s to %s%n",user,start.toString(),end.toString());
         ServerMessage.ServerMessageType moveType = ServerMessage.ServerMessageType.LOAD_GAME;
         ServerMessage loadGame = new LoadGameMessage(moveType,command.getChessMove());
-        connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(loadGame));
+        connections.broadcast("",command.getGameID(),new Gson().toJson(loadGame));
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
         ServerMessage notification = new NotificationMessage(type,message);
         connections.broadcast(command.getAuthToken(), command.getGameID(),new Gson().toJson(notification));
     }
 
     private void leaveGame(UserColorGameCommand command, Session session) throws IOException {
+        try {
+            String username = authService.getUsername(command.getAuthToken());
+            ChessGame.TeamColor color = gameService.getPlayerColor(command.getGameID(),username);
+            if(color == ChessGame.TeamColor.WHITE) {
+                gameService.removeUser(command.getGameID(),"white");
+            } else {
+                gameService.removeUser(command.getGameID(),"black");
+            }
+        } catch (DataAccessException ex) {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
+            UserColorGameCommand comm = new UserColorGameCommand(null,null,0,"Error: invalid move",null);
+            sendError(comm,session);
+            return;
+        }
         connections.remove(command.getAuthToken());
         String message;
         if(command.getColor() == ChessGame.TeamColor.BLACK || command.getColor() == ChessGame.TeamColor.WHITE) {
@@ -111,11 +143,29 @@ public class WebSocketHandler {
     }
 
     private void resign(UserColorGameCommand command, Session session) throws IOException {
+        try {
+            ChessGame game = gameService.getGame(command.getGameID());
+            if(game.isGameOver()) {
+                throw new DataAccessException(500, "Error: game already over");
+            }
+            String username = authService.getUsername(command.getAuthToken());
+            ChessGame.TeamColor color = gameService.getPlayerColor(command.getGameID(), username);
+            if(color == null) {
+                throw new DataAccessException(500, "Error: observer tried resigning");
+            }
+            game.resign();
+            gameService.updateGame(command.getGameID(), game);
+        } catch (DataAccessException e) {
+            UserGameCommand.CommandType type = UserGameCommand.CommandType.RESIGN;
+            UserColorGameCommand comm = new UserColorGameCommand(null,null,0,"Error: invalid move",null);
+            sendError(comm,session);
+            return;
+        }
         String color = (command.getColor() == ChessGame.TeamColor.WHITE) ? "White" : "Black";
         String message = String.format("%s player %s has resigned. The game is now over\n",color,command.getUsername());
         ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.NOTIFICATION;
         ServerMessage notification = new NotificationMessage(type,message);
-        connections.broadcast(command.getAuthToken(),command.getGameID(),new Gson().toJson(notification));
+        connections.broadcast("",command.getGameID(),new Gson().toJson(notification));
     }
 
     private void sendError(UserColorGameCommand command, Session session) throws IOException {

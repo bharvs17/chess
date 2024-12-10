@@ -66,10 +66,10 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, int gameID, String username, ChessMove move) throws DataAccessException {
+    public void makeMove(String authToken, int gameID, String username, ChessMove move, ChessGame.TeamColor color) throws DataAccessException {
         try {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.MAKE_MOVE;
-            UserGameCommand command = new MakeMoveCommand(type, authToken, gameID, username, move);
+            UserGameCommand command = new MakeMoveCommand(type, authToken, gameID, username, move, color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());

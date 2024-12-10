@@ -118,4 +118,15 @@ public class MemoryGameDAO implements GameDAO {
         games.put(gameID, new GameData(gameID,white,black,gName,game));
     }
 
+    @Override
+    public ChessGame.TeamColor getPlayerColor(int gameID, String username) throws DataAccessException {
+        if(games.get(gameID).whiteUsername().equals(username)) {
+            return ChessGame.TeamColor.WHITE;
+        } else if(games.get(gameID).blackUsername().equals(username)) {
+            return ChessGame.TeamColor.BLACK;
+        } else {
+            return null;
+        }
+    }
+
 }

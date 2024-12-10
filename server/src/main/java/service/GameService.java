@@ -52,4 +52,8 @@ public class GameService {
         gameAccess.updateGame(gameID, game);
     }
 
+    public ChessGame.TeamColor getPlayerColor(int gameID, String username) throws DataAccessException {
+        return gameAccess.getPlayerColor(gameID, username);
+    }
+
 }

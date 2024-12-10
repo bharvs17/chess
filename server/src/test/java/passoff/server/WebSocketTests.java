@@ -230,12 +230,10 @@ public class WebSocketTests {
 
         //have white player leave--all other players get notified, white player should not be
         leave(white, gameID, Set.of(black, observer), Set.of());
-
         //replace white player with a different player
         WebsocketUser white2 = registerUser("white2", "WHITE", "white2@chess.com");
         joinGame(gameID, white2, ChessGame.TeamColor.WHITE);
         connectToGame(white2, gameID, true, Set.of(black, observer), Set.of(white));
-
         //new white player can make move
         ChessMove move = new ChessMove(new ChessPosition(2, 5), new ChessPosition(3, 5), null);
         makeMove(white2, gameID, move, true, false, Set.of(black, observer), Set.of(white));

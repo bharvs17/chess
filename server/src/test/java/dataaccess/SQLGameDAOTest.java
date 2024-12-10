@@ -79,7 +79,7 @@ class SQLGameDAOTest {
     @Test
     void removeUserBad() throws DataAccessException {
         gdao.makeGame(new CreateGameReq("game"));
-        Assertions.assertThrows(DataAccessException.class, () -> gdao.removeUser(0,"white"));
+        Assertions.assertThrows(DataAccessException.class, () -> gdao.removeUser(0, "white"));
     }
 
     @Test

@@ -187,17 +187,32 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public void removeUser(int gameID, String color) throws DataAccessException {
-        try(var conn = DatabaseManager.getConnection()) {
-            var statement = "UPDATE games SET whiteusername = NULL WHERE gameID = ?";
-            try(var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1,gameID);
-                int changed = ps.executeUpdate();
-                if(changed != 1) {
-                    throw new DataAccessException(400, "Error: something went wrong updating the database");
+        if(color.equals("white")) {
+            try (var conn = DatabaseManager.getConnection()) {
+                var statement = "UPDATE games SET whiteusername = NULL WHERE gameID = ?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.setInt(1, gameID);
+                    int changed = ps.executeUpdate();
+                    if (changed != 1) {
+                        throw new DataAccessException(400, "Error: something went wrong updating the database");
+                    }
                 }
+            } catch (Exception ex) {
+                throw new DataAccessException(400, "Error: something went wrong trying to leave game");
             }
-        } catch (Exception ex) {
-            throw new DataAccessException(400, "Error: something went wrong trying to leave game");
+        } else {
+            try (var conn = DatabaseManager.getConnection()) {
+                var statement = "UPDATE games SET blackusername = NULL WHERE gameID = ?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.setInt(1, gameID);
+                    int changed = ps.executeUpdate();
+                    if (changed != 1) {
+                        throw new DataAccessException(400, "Error: something went wrong updating the database");
+                    }
+                }
+            } catch (Exception ex) {
+                throw new DataAccessException(400, "Error: something went wrong trying to leave game");
+            }
         }
     }
 
@@ -214,6 +229,41 @@ public class SQLGameDAO implements GameDAO {
             }
         } catch (Exception ex) {
             throw new DataAccessException(400, "Error: something went wrong trying to update chess board in database");
+        }
+    }
+
+    @Override
+    public ChessGame.TeamColor getPlayerColor(int gameID, String username) throws DataAccessException {
+        String white = null;
+        String black = null;
+        try(var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT whiteusername FROM games WHERE gameID = ?";
+            try(var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1,gameID);
+                try(var rs = ps.executeQuery()) {
+                    if(rs.next()) {
+                        white = rs.getString("whiteusername");
+                    }
+                }
+            }
+            statement = "SELECT blackusername FROM games WHERE gameID = ?";
+            try(var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1,gameID);
+                try(var rs = ps.executeQuery()) {
+                    if(rs.next()) {
+                        black = rs.getString("blackusername");
+                    }
+                }
+            }
+            if(username.equals(white)) {
+                return ChessGame.TeamColor.WHITE;
+            } else if(username.equals(black)) {
+                return ChessGame.TeamColor.BLACK;
+            } else {
+                return null;
+            }
+        } catch(Exception ex) {
+            throw new DataAccessException(400, "Error something went wrong getting player color");
         }
     }
 

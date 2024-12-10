@@ -331,11 +331,10 @@ public class ChessClient implements ServerMessageHandler {
             throw new DataAccessException(400, "Error: Invalid move- either it is not your turn OR you cannot move the other team's piece\n");
         }
         try {
-            currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
-            server.updateGame(currID, currentGame);
-            ws.makeMove(currAuth,currID,currUsername,move);
-            String result = redrawChessBoard("board") + "\n";
-            result = result + "Successfully made move " + move.getStartPosition().toString();
+            //currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
+            //server.updateGame(currID, currentGame);
+            ws.makeMove(currAuth,currID,currUsername,move,currentColor);
+            String result = "Successfully made move " + move.getStartPosition().toString();
             result = result + " to " + move.getEndPosition().toString() + "\n";
             result = result + statusChecker(currentGame);
             return result;
