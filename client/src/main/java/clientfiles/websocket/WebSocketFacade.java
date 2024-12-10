@@ -39,7 +39,6 @@ public class WebSocketFacade extends Endpoint {
                     } else if(msg.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
                         msgHandler.loadGame(new Gson().fromJson(message,LoadGameMessage.class));
                     } else {
-                        System.out.println("sending error message to client");
                         msgHandler.error(new Gson().fromJson(message, ErrorMessage.class));
                     }
                 }
@@ -81,7 +80,7 @@ public class WebSocketFacade extends Endpoint {
             UserGameCommand.CommandType type = UserGameCommand.CommandType.LEAVE;
             UserGameCommand command = new UserColorGameCommand(type,authToken,gameID,username,color);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            this.session.close();
+            //this.session.close();
         } catch(IOException ex) {
             throw new DataAccessException(500, ex.getMessage());
         }

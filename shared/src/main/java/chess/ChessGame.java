@@ -1,5 +1,7 @@
 package chess;
 
+import com.sun.source.tree.WhileLoopTree;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -119,14 +121,28 @@ public class ChessGame {
         if(move.getPromotionPiece() != null) {
             board.addPiece(move.getEndPosition(),new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(),move.getPromotionPiece()));
             board.addPiece(move.getStartPosition(),null);
+            gameOverCheck();
         } else {
             board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             board.addPiece(move.getStartPosition(), null);
+            gameOverCheck();
         }
         if(currentTeam == TeamColor.WHITE) {
             setTeamTurn(TeamColor.BLACK);
         } else {
             setTeamTurn(TeamColor.WHITE);
+        }
+    }
+
+    private void gameOverCheck() {
+        if(isInCheckmate(TeamColor.WHITE)) {
+            isOver = true;
+        } else if(isInCheckmate(TeamColor.BLACK)) {
+            isOver = true;
+        } else if(isInStalemate(TeamColor.WHITE)) {
+            isOver = true;
+        } else if(isInStalemate(TeamColor.BLACK)) {
+            isOver = true;
         }
     }
 

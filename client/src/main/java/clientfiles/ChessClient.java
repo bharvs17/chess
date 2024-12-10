@@ -39,6 +39,7 @@ public class ChessClient implements ServerMessageHandler {
         server = new ServerFacade(url);
         state = State.SIGNEDOUT;
         success = true;
+        ws = null;
     }
 
     public String eval(String input) {
@@ -148,6 +149,9 @@ public class ChessClient implements ServerMessageHandler {
                 currAuth = server.login(new LoginReq(params[0],params[1])).authToken();
                 state = State.SIGNEDIN;
                 currUsername = params[0];
+                if(ws == null) {
+                    ws = new WebSocketFacade(url,this);
+                }
                 return String.format("Successfully logged in user: %s\n", params[0]);
             } catch(DataAccessException ex) {
                 throw new DataAccessException(400, "Error: no such user in database or wrong password.\n");
@@ -276,10 +280,11 @@ public class ChessClient implements ServerMessageHandler {
                 int gameID = games.get(reqNum - 1).gameID();
                 currID = gameID;
                 currentGame = server.getGame(gameID);
-                state = State.OBSERVINGGAME;
                 currentColor = null;
                 ws.connectToGame(currAuth, currID, currUsername, null);
-                return BoardPrinter.boardString(currentGame, currentColor, false);
+                state = State.OBSERVINGGAME;
+                //return BoardPrinter.boardString(currentGame, currentColor, false);
+                return "";
             } catch(Exception ex) {
                 throw new DataAccessException(400, "Error: enter a valid game number\n");
             }
@@ -299,7 +304,7 @@ public class ChessClient implements ServerMessageHandler {
     public String leave(String... params) throws DataAccessException {
         if(state == State.OBSERVINGGAME) {
             state = State.SIGNEDIN; //ALSO shouldn't receive notification updates when just signed in
-            ws.leaveGame(currAuth,currID,currUsername,currentColor);
+            ws.leaveGame(currAuth,currID,currUsername,null);
             currentGame = null;
             currentColor = null;
             currID = -1;
@@ -316,7 +321,7 @@ public class ChessClient implements ServerMessageHandler {
             currentColor = null;
             currentGame = null;
             currID = -1;
-            ws = null; //should stop sending messages when leaving game
+            //ws = null;
             return "Successfully left game\n";
         }
     }
@@ -334,10 +339,10 @@ public class ChessClient implements ServerMessageHandler {
             //currentGame.makeMove(move); //really should be sending the chess move to server facade and then having server/sqlgamedao deal with that
             //server.updateGame(currID, currentGame);
             ws.makeMove(currAuth,currID,currUsername,move,currentColor);
-            String result = "Successfully made move " + move.getStartPosition().toString();
+            /*String result = "Successfully made move " + move.getStartPosition().toString();
             result = result + " to " + move.getEndPosition().toString() + "\n";
-            result = result + statusChecker(currentGame);
-            return result;
+            result = result + statusChecker(currentGame);*/
+            return "";
         } catch(Exception ex) {
             throw new DataAccessException(400, ex.getMessage() + "\n");
         }
@@ -345,14 +350,20 @@ public class ChessClient implements ServerMessageHandler {
     }
 
     public String resign(String... params) throws DataAccessException {
+        if(currentGame.isGameOver()) {
+            return "The game is already over\n";
+        }
+        if(currentGame.getTeamTurn() != currentColor) {
+            return "Wait until your turn to resign\n";
+        }
         System.out.println("Are you sure you want to forfeit the match? Enter 'confirm' to do so, enter anything else to cancel");
         Scanner scanner = new Scanner(System.in);
         System.out.print(">>> ");
         String line = scanner.nextLine();
         if(line.equalsIgnoreCase("confirm")) {
             try {
-                currentGame.resign();
-                server.updateGame(currID,currentGame);
+                //currentGame.resign();
+                //server.updateGame(currID,currentGame);
                 ws.resignFromGame(currAuth,currID,currUsername,currentColor);
                 return "Successfully resigned.\n";
             } catch (Exception ex) {

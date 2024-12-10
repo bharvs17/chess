@@ -120,7 +120,7 @@ public class WebSocketHandler {
             ChessGame.TeamColor color = gameService.getPlayerColor(command.getGameID(),username);
             if(color == ChessGame.TeamColor.WHITE) {
                 gameService.removeUser(command.getGameID(),"white");
-            } else {
+            } else if(color == ChessGame.TeamColor.BLACK) {
                 gameService.removeUser(command.getGameID(),"black");
             }
         } catch (DataAccessException ex) {
