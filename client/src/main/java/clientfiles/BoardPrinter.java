@@ -35,28 +35,6 @@ public class BoardPrinter {
         return boardStr.toString();
     }
 
-    public static String boardDefault() {
-        ChessBoard startingBoard = new ChessBoard();
-        startingBoard.resetBoard();
-        StringBuilder board = new StringBuilder();
-        board.append(SET_TEXT_BOLD);
-        //white's perspective
-        board.append(topBottomLine(0));
-        for(int i = 8; i > 0; i--) {
-            board.append(rowString(startingBoard,i,0,false));
-        }
-        board.append(topBottomLine(0));
-        //black's perspective
-        board.append(topBottomLine(1));
-        for(int i = 1; i < 9; i++) {
-            board.append(rowString(startingBoard,i,1,false));
-        }
-        board.append(topBottomLine(1));
-        board.append(RESET_BG_COLOR);
-        board.append(RESET_TEXT_COLOR);
-        return board.toString();
-    }
-
     private static String topBottomLine(int color) {
         String[] cols;
         if (color == 0) {
